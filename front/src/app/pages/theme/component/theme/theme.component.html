@@ -1,0 +1,25 @@
+<div class="list">
+  <mat-card class="item mt2" fxLayout="row" fxFlex>
+    <div class="col-6" *ngFor="let theme of (themes | async)">
+      <mat-card-header>
+        <mat-card-title>
+          {{ theme.titre }}
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>
+          {{ theme.description }}
+          {{theme.follow}}
+        </p>
+        <div class="button">
+          <button *ngIf="!theme?.follow" mat-raised-button color="primary" (click)="follow(theme.themeId)">
+            <span class="ml1">S'abonner</span>
+          </button>
+          <button *ngIf="theme?.follow" mat-raised-button color="warn" (click)="unFollow(theme.themeId)">
+            <span class="ml1">Se desabonner</span>
+          </button>
+        </div>
+      </mat-card-content>
+    </div>
+  </mat-card>
+</div>

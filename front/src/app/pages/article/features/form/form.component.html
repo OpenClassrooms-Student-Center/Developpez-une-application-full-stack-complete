@@ -1,0 +1,37 @@
+<div class="create m3">
+  <div fxLayout="row" fxLayoutAlign="start">
+    <button mat-icon-button routerLink="/article/list">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+  </div>
+  <mat-card fxLayout="column" fxLayoutAlign="center center">
+    <mat-cardheader fxLayout="column" fxLayoutAlign="center center">
+      <mat-card-title class="title_center" fxLayout="column" fxLayoutAlign="center center">
+        <h1>Créer un nouvel article</h1>
+      </mat-card-title>
+    </mat-cardheader>
+    <mat-card-content *ngIf="articleForm" fxLayout="column" fxLayoutAlign="center center">
+      <form class="mt2" fxLayout="column" [formGroup]="articleForm" (ngSubmit)="submit()">
+        <mat-form-field appearance="outline" fxFlex>
+          <select matNativeControl formControlName="theme_id" id="theme_id">
+            <option value="" disabled selected>Selectionner un theme</option>
+            <option *ngFor="let theme of (themes$ | async)" [value]="theme.themeId">
+              {{theme.titre}}
+            <option>
+          </select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="" fxFlex>
+          <input matInput formControlName="titre" placeholder="Titre de l'article">
+        </mat-form-field>
+        <mat-form-field appearance="outline" fxFlex>
+          <textarea matInput rows="8" formControlName="contenu"></textarea>
+        </mat-form-field>
+        <div fxLayout="row" fxLayoutAlign="center center">
+          <button mat-raised-button color="primary" type="submit" [disabled]="articleForm.invalid">
+            Save
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+  </div>

@@ -1,0 +1,72 @@
+<div class="list">
+    <mat-card>
+        <br>
+        <div fxLayout="column">
+            <div fxLayout="row" fxLayoutAlign="space-between center" style="padding-left: 50px">
+                <div class="button">
+                    <button mat-raised-button color="primary" routerLink="/article/create" role="button">Créer un
+                        article</button>
+                </div>
+                <div class="fleche">
+                    <p>Trier par</p>
+                    <button mat-icon-button (click)="onDownClick()">
+                        <span class="material-icons">
+                            arrow_downward
+                        </span>
+                    </button>
+                    <br>
+                </div>
+            </div>
+            <div class="" *ngIf="!ascending">
+                <div class="items mt2" fxLayout="row wrap" fxLayout.lt-md="column" style="padding-left: 50px">
+                        <mat-card class="item" *ngFor="let article of (articles$ | async)"
+                            [routerLink]="['/article/detail',article.articleId]" fxFlex>
+                        <mat-card-header>
+                            <mat-card-title>
+                                <h3>{{ article.titre }}</h3>
+                            </mat-card-title>
+                        </mat-card-header>
+                        <mat-card-content>
+                            <p>
+                                {{ article.createdAt | date: 'longDate' }}
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{
+                                article.auteur
+                                }}
+                            </p>
+                            <p>
+                                {{ article.contenu }}
+                            </p>
+                        </mat-card-content>
+                    </mat-card>
+                </div>
+            </div>
+            <mat-card *ngIf="ascending">
+                <div class="row-container">
+                    <div class="items mt2" fxLayout="row wrap" fxLayout.lt-md="column" style="padding-left: 50px">
+                        <mat-card class="item" *ngFor="let article of (articlesAsc$ | async)"
+                            [routerLink]="['/article/detail',article.articleId]" fxFlex>
+                            <mat-card-header>
+                                <mat-card-title>
+                                    <h3>{{ article.titre }}</h3>
+                                </mat-card-title>
+                            </mat-card-header>
+                            <mat-card-content>
+                                <div>
+                                    <p>
+                                        {{ article.createdAt | date: 'longDate' }}
+                                        {{ article.auteur }}
+                                    </p>
+                                </div>
+                                <p>
+                                    {{ article.contenu }}
+                                </p>
+                            </mat-card-content>
+                        </mat-card>
+                        <br>
+                    </div>
+                </div>
+            </mat-card>
+        </div>
+    </mat-card>
+</div>

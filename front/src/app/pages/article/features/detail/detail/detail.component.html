@@ -1,0 +1,62 @@
+<div class="m3">
+    <mat-card>
+        <mat-card-title fxLayout="column" style="padding-left: 50px">
+            <div fxLayout="row">
+                <div class="button">
+                    <button mat-icon-button (click)="back()">
+                        <mat-icon>arrow_back</mat-icon>
+                    </button>
+                </div>
+                <div class="title">
+                    <h3>{{ article?.titre | titlecase }} </h3>
+                </div>
+            </div>
+        </mat-card-title>
+        <mat-card-content>
+            <div class="my2" fxLayout="column" style="padding-left: 50px">
+                <div>
+                    <p>
+                        {{ article?.createdAt | date: 'longDate' }}
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        {{ article?.auteur }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        {{ article?.theme?.titre}}
+                    </p>
+                </div>
+                <div>
+                    <p>
+                        {{ article?.contenu }}
+                    </p>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+    <div style="padding-left: 50px">
+        <h4> Commentaires </h4>
+    </div>
+    <mat-card class="commentMat" fxLayout="column">
+        <!-- <mat-card-title style="padding-left: 50px">
+            <h4> Commentaires </h4>
+        </mat-card-title> -->
+        <mat-card-content *ngFor="let comment of comments">
+            <div fxLayout="row" style="padding-left: 70px">
+                <h5>
+                    {{comment.auteur }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </h5>
+                <mat-card class="comment">
+                    <h5> {{comment.commentaire }} </h5>
+                </mat-card>
+            </div>
+        </mat-card-content>
+        <form [formGroup]="commentForm" (ngSubmit)="submit()">
+            <div fxLayout="row">
+                <div class="text">
+                    <textarea class="commentForm" matInput placeholder="Ecrivez ici votre commentaire"
+                        formControlName="commentaire"></textarea>
+                </div>
+                <div class="buttonSubmit">
+                    <button class="btn" type="submit">
+                        <img src="/assets/send-icon.png" width="90" height="90" alt="submit"></button>
+                </div>
+            </div>
+        </form>
+    </mat-card>
+</div>

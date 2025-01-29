@@ -1,0 +1,10 @@
+h1 {
+    text-align: center;
+    font-weight: bold ;
+}
+
+.title_center {
+    display: flex;
+    justify-content: center; /* align horizontal */
+    align-items: center; /* align vertical */
+  }

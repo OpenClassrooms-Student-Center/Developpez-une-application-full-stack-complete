@@ -1,1 +1,22 @@
-<router-outlet></router-outlet>
+<div class="app">
+  <div *ngIf="$isLogged() | async; else notLogged">
+    <div class="header">
+      <img class="logo" src="/assets/logo_p6.png" style="padding-left: 50px" alt="logo" />
+      <input class="menu-btn" type="checkbox" id="menu-btn" />
+      <label class="menu-icon" for="menu-btn">
+        <span class="navicon"></span>
+      </label>
+      <ul class="menu">
+        <li><a routerLink="article/list" class="link">Articles</a></li>
+        <li><a routerLink="theme" class="link">Thèmes</a></li>
+        <li><a routerLink="edit" class="link">
+            <img class="image" src="/assets/person-icon.png" alt="logo"></a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+<ng-template #notLogged>
+</ng-template>
+<div>
+  <router-outlet></router-outlet>
+</div>

@@ -1,0 +1,45 @@
+<div class="m3">>
+  <mat-card>
+  <mat-cardheader fxLayout="column" fxLayoutAlign="center center">
+    <mat-card-title >
+      <h1>Profil Utilisateur</h1>
+    </mat-card-title>
+    </mat-cardheader>
+    <mat-card-content class="user" *ngIf="editUserForm" fxLayout="column" fxLayoutAlign="center center">
+      <form class="mt2" fxLayout="column" [formGroup]="editUserForm" (ngSubmit)="submit()">
+        <mat-form-field appearance="outline" fxFlex>
+          <input matInput formControlName="firstName">
+        </mat-form-field>
+        <mat-form-field appearance="outline" fxFlex>
+          <input matInput formControlName="email">
+        </mat-form-field>
+        <mat-form-field appearance="outline" fxFlex>
+          <input matInput formControlName="password" placeholder="Mot de passe">
+        </mat-form-field>
+        <div fxLayout="row" fxLayoutAlign="center center">
+          <div>
+            <button mat-raised-button color="primary" type="submit" [disabled]="editUserForm.invalid">
+              Sauvegarder
+            </button>
+          </div>
+          <div>
+            <span routerLink="logout()" class="link" (click)="logout()">Se deconnecter</span>
+          </div>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+  <h1>Abonnements</h1>
+  <mat-card >
+    <div *ngFor="let theme of themes$" fxFlex>
+      <mat-card-header>
+        <mat-card-title>
+          {{ theme.titre}}
+        </mat-card-title>
+        <mat-card-subtitle>
+          {{ theme.description}}
+        </mat-card-subtitle>
+      </mat-card-header>
+    </div>
+  </mat-card>
+</div>
