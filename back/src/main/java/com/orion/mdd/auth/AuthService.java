@@ -3,6 +3,7 @@ package com.orion.mdd.auth;
 import com.orion.mdd.common.exception.ConflictException;
 import com.orion.mdd.user.User;
 import com.orion.mdd.user.UserRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +24,15 @@ public class AuthService {
     /**
      * Creates an account whose password is stored hashed.
      *
+     * <p>
+     * Two people can pick the same username at the same moment: both pass the checks below, and the unique
+     * constraints of the database then refuse the second one.
+     *
      * @param request
      *            the data of the new user
      * @return the saved user
      * @throws ConflictException
-     *             if the username or the e-mail is already taken
+     *             if the username or the e-mail is already taken, even by a request running at the same moment
      */
     public User register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.username())) {
@@ -38,7 +43,11 @@ public class AuthService {
         }
 
         User user = new User(request.username(), request.email(), passwordEncoder.encode(request.password()));
-        return userRepository.save(user);
+        try {
+            return userRepository.save(user);
+        } catch (DataIntegrityViolationException exception) {
+            throw new ConflictException("Ce nom d’utilisateur ou cette adresse e-mail est déjà pris.");
+        }
     }
 
 }
