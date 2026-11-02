@@ -30,6 +30,8 @@
         <java.version>25</java.version>
         <spotless.version>3.10.4</spotless.version>
         <jacoco.version>0.8.16</jacoco.version>
+        <springdoc.version>3.2.0</springdoc.version>
+        <bouncycastle.version>1.86</bouncycastle.version>
         <!-- Security fixes not yet in Spring Boot 4.1.2: remove once Boot provides these versions or newer -->
         <jackson-bom.version>3.1.8</jackson-bom.version>
         <mysql.version>26.10.0</mysql.version>
@@ -62,6 +64,16 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-mysql</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>${bouncycastle.version}</version>
         </dependency>
 
         <dependency>
