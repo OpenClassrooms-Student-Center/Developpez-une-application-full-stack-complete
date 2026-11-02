@@ -6,9 +6,12 @@ import com.orion.mdd.user.UserRepository;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,6 +58,20 @@ class RegistrationIntegrationTests {
         assertThat(passwordEncoder.matches(PASSWORD, user.getPassword())).isTrue();
     }
 
+    @Test
+    void logsTheNewUserIn() throws Exception {
+        // Act
+        MvcResult result = register("arthur.dent", "arthur.dent@example.com", PASSWORD).andReturn();
+
+        // Assert
+        String cookie = result.getResponse().getHeader(HttpHeaders.SET_COOKIE);
+        assertThat(cookie).startsWith("mdd_token=").contains("Max-Age=86400", "Path=/", "Secure", "HttpOnly",
+                "SameSite=Strict");
+        mockMvc.perform(get("/api/users/me").cookie(tokenCookie(result)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("arthur.dent"));
+    }
+
     /** Sends what a browser sends: a first call gives the CSRF cookie, then the POST repeats it in a header. */
     private ResultActions register(String username, String email, String password) throws Exception {
         Cookie csrfCookie = mockMvc.perform(get("/api/users/me")).andReturn().getResponse().getCookie("XSRF-TOKEN");
@@ -69,6 +86,10 @@ class RegistrationIntegrationTests {
         return """
                 {"username": "%s", "email": "%s", "password": "%s"}
                 """.formatted(username, email, password);
+    }
+
+    private static Cookie tokenCookie(MvcResult result) {
+        return MockCookie.parse(result.getResponse().getHeader(HttpHeaders.SET_COOKIE));
     }
 
 }

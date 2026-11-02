@@ -1,23 +1,28 @@
 package com.orion.mdd.common.security;
 
+import jakarta.servlet.http.Cookie;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.util.WebUtils;
 
 import java.util.Map;
 
 /**
- * Security rules of the API: everything needs a logged-in user except registration, and every write request needs a
- * CSRF token.
+ * Security rules of the API: a valid token in the {@value #TOKEN_COOKIE} cookie is required everywhere except
+ * registration, and every write request needs a CSRF token.
  */
 @Configuration
 public class SecurityConfig {
+
+    public static final String TOKEN_COOKIE = "mdd_token";
 
     private static final String ARGON2 = "argon2";
     private static final int SALT_LENGTH = 16;
@@ -40,7 +45,8 @@ public class SecurityConfig {
     }
 
     /**
-     * Declares the public routes and turns on the CSRF protection meant for single-page applications.
+     * Declares the public routes, turns on the CSRF protection meant for single-page applications and reads the
+     * token from the cookie.
      *
      * @param http
      *            the security configuration builder
@@ -53,7 +59,13 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
-                        .anyRequest().authenticated());
+                        .anyRequest().authenticated())
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .bearerTokenResolver(request -> {
+                            Cookie cookie = WebUtils.getCookie(request, TOKEN_COOKIE);
+                            return cookie == null ? null : cookie.getValue();
+                        })
+                        .jwt(Customizer.withDefaults()));
         return http.build();
     }
 
