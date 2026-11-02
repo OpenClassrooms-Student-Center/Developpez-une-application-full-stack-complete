@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -70,6 +71,35 @@ class RegistrationIntegrationTests {
         mockMvc.perform(get("/api/users/me").cookie(tokenCookie(result)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("arthur.dent"));
+    }
+
+    @Test
+    void refusesATakenUsernameWhateverItsCase() throws Exception {
+        // Arrange
+        register("arthur.dent", "arthur.dent@example.com", PASSWORD);
+
+        // Act
+        ResultActions response = register("Arthur.Dent", "ford.prefect@example.com", PASSWORD);
+
+        // Assert
+        response.andExpect(status().isConflict())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.detail").value("Ce nom d’utilisateur est déjà pris."))
+                .andExpect(jsonPath("$.errors.username").value("Ce nom d’utilisateur est déjà pris."))
+                .andExpect(jsonPath("$.instance").value("/api/auth/register"));
+    }
+
+    @Test
+    void refusesATakenEmailWhateverItsCase() throws Exception {
+        // Arrange
+        register("arthur.dent", "arthur.dent@example.com", PASSWORD);
+
+        // Act
+        ResultActions response = register("ford.prefect", "ARTHUR.DENT@example.com", PASSWORD);
+
+        // Assert
+        response.andExpect(status().isConflict())
+                .andExpect(jsonPath("$.errors.email").value("Cette adresse e-mail est déjà utilisée."));
     }
 
     /** Sends what a browser sends: a first call gives the CSRF cookie, then the POST repeats it in a header. */
