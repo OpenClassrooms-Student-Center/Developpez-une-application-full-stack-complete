@@ -41,6 +41,16 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return problem;
     }
 
+    /**
+     * Answers 401 when the account of a token no longer exists: its owner counts as logged out.
+     *
+     * @return the Problem Details
+     */
+    @ExceptionHandler(UserNotFoundException.class)
+    public ProblemDetail handleUserNotFound() {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Vous devez être connecté.");
+    }
+
     @Override
     protected @Nullable ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception,
             HttpHeaders headers, HttpStatusCode status, WebRequest request) {
