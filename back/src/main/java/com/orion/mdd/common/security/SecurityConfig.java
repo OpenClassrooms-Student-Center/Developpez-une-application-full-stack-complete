@@ -5,19 +5,21 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.web.util.WebUtils;
 
 import java.util.Map;
 
 /**
  * Security rules of the API: a valid token in the {@value #TOKEN_COOKIE} cookie is required everywhere except
- * registration, and every write request needs a CSRF token.
+ * registration, the Swagger documentation and the error page, and every write request needs a CSRF token.
  */
 @Configuration
 public class SecurityConfig {
@@ -30,6 +32,12 @@ public class SecurityConfig {
     private static final int PARALLELISM = 1;
     private static final int MEMORY_KIB = 19456;
     private static final int ITERATIONS = 2;
+
+    private final SecurityErrorHandler securityErrorHandler;
+
+    public SecurityConfig(SecurityErrorHandler securityErrorHandler) {
+        this.securityErrorHandler = securityErrorHandler;
+    }
 
     /**
      * Hashes the passwords with Argon2id, at OWASP's minimum settings. The delegating encoder writes the algorithm
@@ -45,8 +53,7 @@ public class SecurityConfig {
     }
 
     /**
-     * Declares the public routes, turns on the CSRF protection meant for single-page applications and reads the
-     * token from the cookie.
+     * Declares the public routes, reads the token from the cookie and returns the errors as Problem Details.
      *
      * @param http
      *            the security configuration builder
@@ -55,18 +62,44 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http
-                .csrf(csrf -> csrf.spa())
+                .csrf(csrf -> csrf
+                        .spa()
+                        .withObjectPostProcessor(protectRequestsWithAToken()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .bearerTokenResolver(request -> {
                             Cookie cookie = WebUtils.getCookie(request, TOKEN_COOKIE);
                             return cookie == null ? null : cookie.getValue();
                         })
-                        .jwt(Customizer.withDefaults()));
+                        .jwt(Customizer.withDefaults())
+                        .authenticationEntryPoint(securityErrorHandler)
+                        .accessDeniedHandler(securityErrorHandler))
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(securityErrorHandler)
+                        .accessDeniedHandler(securityErrorHandler));
         return http.build();
+    }
+
+    /**
+     * Spring Security skips the CSRF check on requests that carry a token, because a token normally travels in a
+     * header that the browser never adds by itself. Here it travels in a cookie, which the browser does add, so the
+     * check must stay.
+     */
+    private ObjectPostProcessor<CsrfFilter> protectRequestsWithAToken() {
+        return new ObjectPostProcessor<>() {
+
+            @Override
+            public <O extends CsrfFilter> O postProcess(O filter) {
+                filter.setRequireCsrfProtectionMatcher(CsrfFilter.DEFAULT_CSRF_MATCHER);
+                return filter;
+            }
+
+        };
     }
 
 }

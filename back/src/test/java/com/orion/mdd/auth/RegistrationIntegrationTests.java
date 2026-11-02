@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -141,9 +142,39 @@ class RegistrationIntegrationTests {
                 Arguments.of(valid, email, "DontPanic42", "password"));
     }
 
+    @Test
+    void refusesARequestWithoutACsrfToken() throws Exception {
+        // Act
+        ResultActions response = mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body("arthur.dent", "arthur.dent@example.com", PASSWORD)));
+
+        // Assert
+        response.andExpect(status().isForbidden())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.detail").value("Cette requête a été refusée."));
+        assertThat(userRepository.count()).isZero();
+    }
+
+    @Test
+    void refusesARequestWithoutACsrfTokenEvenFromALoggedInUser() throws Exception {
+        // Arrange
+        Cookie token = tokenCookie(register("arthur.dent", "arthur.dent@example.com", PASSWORD).andReturn());
+
+        // Act
+        ResultActions response = mockMvc.perform(post("/api/auth/register")
+                .cookie(token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body("ford.prefect", "ford.prefect@example.com", PASSWORD)));
+
+        // Assert
+        response.andExpect(status().isForbidden());
+    }
+
     /** Sends what a browser sends: a first call gives the CSRF cookie, then the POST repeats it in a header. */
     private ResultActions register(String username, String email, String password) throws Exception {
-        Cookie csrfCookie = mockMvc.perform(get("/api/users/me")).andReturn().getResponse().getCookie("XSRF-TOKEN");
+        Cookie csrfCookie = Objects.requireNonNull(
+                mockMvc.perform(get("/api/users/me")).andReturn().getResponse().getCookie("XSRF-TOKEN"));
         return mockMvc.perform(post("/api/auth/register")
                 .cookie(csrfCookie)
                 .header("X-XSRF-TOKEN", csrfCookie.getValue())
@@ -158,7 +189,7 @@ class RegistrationIntegrationTests {
     }
 
     private static Cookie tokenCookie(MvcResult result) {
-        return MockCookie.parse(result.getResponse().getHeader(HttpHeaders.SET_COOKIE));
+        return MockCookie.parse(Objects.requireNonNull(result.getResponse().getHeader(HttpHeaders.SET_COOKIE)));
     }
 
 }
