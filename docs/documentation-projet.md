@@ -209,8 +209,8 @@ Cookie: XSRF-TOKEN=8f3a2c51...
 X-XSRF-TOKEN: 8f3a2c51...
 
 {
-  "email": "jdupont@example.com",
-  "password": "Exemple-2026"
+  "email": "arthur.dent@example.com",
+  "password": "Dont-Panic-42"
 }
 ```
 
@@ -221,8 +221,8 @@ Content-Type: application/json
 
 {
   "id": 1,
-  "username": "jdupont",
-  "email": "jdupont@example.com"
+  "username": "arthur.dent",
+  "email": "arthur.dent@example.com"
 }
 ```
 
