@@ -5,6 +5,9 @@ import com.orion.mdd.user.User;
 import com.orion.mdd.user.UserRepository;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -13,6 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -100,6 +105,40 @@ class RegistrationIntegrationTests {
         // Assert
         response.andExpect(status().isConflict())
                 .andExpect(jsonPath("$.errors.email").value("Cette adresse e-mail est déjà utilisée."));
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidFields")
+    void refusesAnInvalidField(String username, String email, String password, String invalidField) throws Exception {
+        // Act
+        ResultActions response = register(username, email, password);
+
+        // Assert
+        response.andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.errors." + invalidField).isString());
+        assertThat(userRepository.count()).isZero();
+    }
+
+    private static Stream<Arguments> invalidFields() {
+        String valid = "arthur.dent";
+        String email = "arthur.dent@example.com";
+        return Stream.of(
+                Arguments.of("   ", email, PASSWORD, "username"),
+                Arguments.of("42", email, PASSWORD, "username"),
+                Arguments.of("zaphod.beeblebrox.the.president", email, PASSWORD, "username"),
+                Arguments.of("arthur.dent@home", email, PASSWORD, "username"),
+                Arguments.of("marvin.déprimé", email, PASSWORD, "username"),
+                Arguments.of(valid, "   ", PASSWORD, "email"),
+                Arguments.of(valid, "arthur.dent", PASSWORD, "email"),
+                Arguments.of(valid, "dent@" + "vogon.".repeat(40) + "example.com", PASSWORD, "email"),
+                Arguments.of(valid, email, "   ", "password"),
+                Arguments.of(valid, email, "Deep-42", "password"),
+                Arguments.of(valid, email, "Dont-Panic-42".repeat(5), "password"),
+                Arguments.of(valid, email, "dont-panic-42", "password"),
+                Arguments.of(valid, email, "DONT-PANIC-42", "password"),
+                Arguments.of(valid, email, "Dont-Panic", "password"),
+                Arguments.of(valid, email, "DontPanic42", "password"));
     }
 
     /** Sends what a browser sends: a first call gives the CSRF cookie, then the POST repeats it in a header. */

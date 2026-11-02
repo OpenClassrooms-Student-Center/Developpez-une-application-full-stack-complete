@@ -1,7 +1,11 @@
 package com.orion.mdd.auth;
 
+import com.orion.mdd.common.validation.ValidEmail;
+import com.orion.mdd.common.validation.ValidPassword;
+import com.orion.mdd.common.validation.ValidUsername;
+
 /**
- * The data sent to create an account.
+ * The data sent to create an account, checked against the rules of the data definition annex.
  *
  * @param username
  *            the public name of the user
@@ -10,6 +14,7 @@ package com.orion.mdd.auth;
  * @param password
  *            the password
  */
-public record RegisterRequest(String username, String email, String password) {
+public record RegisterRequest(@ValidUsername String username, @ValidEmail String email,
+        @ValidPassword String password) {
 
 }
