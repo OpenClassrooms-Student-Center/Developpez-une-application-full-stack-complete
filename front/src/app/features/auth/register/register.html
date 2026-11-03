@@ -1,0 +1,37 @@
+<app-auth-layout heading="Inscription">
+  <form class="form" [formRoot]="registerForm">
+    <label for="username">Nom d’utilisateur</label>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <input matInput id="username" autocomplete="username" [formField]="registerForm.username" />
+      <mat-error>{{ registerForm.username().errors()[0]?.message }}</mat-error>
+    </mat-form-field>
+
+    <label for="email">Adresse e-mail</label>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <input
+        matInput
+        id="email"
+        type="email"
+        autocomplete="email"
+        [formField]="registerForm.email"
+      />
+      <mat-error>{{ registerForm.email().errors()[0]?.message }}</mat-error>
+    </mat-form-field>
+
+    <label for="password">Mot de passe</label>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <input
+        matInput
+        id="password"
+        type="password"
+        autocomplete="new-password"
+        [formField]="registerForm.password"
+      />
+      <mat-error>{{ registerForm.password().errors()[0]?.message }}</mat-error>
+    </mat-form-field>
+
+    <button matButton="filled" type="submit" [disabled]="registerForm().submitting()">
+      S’inscrire
+    </button>
+  </form>
+</app-auth-layout>

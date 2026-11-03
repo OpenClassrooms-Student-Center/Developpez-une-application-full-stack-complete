@@ -1,0 +1,17 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+label {
+  margin-top: 1.25rem;
+  font: var(--mat-sys-body-large);
+  font-weight: 600;
+}
+
+button {
+  align-self: center;
+  width: 10rem;
+  margin-top: 2rem;
+}

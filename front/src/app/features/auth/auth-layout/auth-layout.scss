@@ -1,0 +1,94 @@
+@use '@angular/material' as mat;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.banner {
+  display: none;
+  padding: 0.75rem 2.5rem;
+  border-bottom: 1px solid var(--mat-sys-on-surface);
+
+  img {
+    display: block;
+    width: 140px;
+    height: auto;
+  }
+
+  @media (min-width: 600px) {
+    display: block;
+  }
+}
+
+.page {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 1rem;
+
+  @media (min-width: 600px) {
+    padding: 1.5rem 2rem;
+  }
+}
+
+.back {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+
+  @media (min-width: 600px) {
+    top: 1.5rem;
+    left: 2rem;
+  }
+}
+
+.back svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: currentColor;
+}
+
+.logo {
+  display: block;
+  width: min(225px, 60vw);
+  height: auto;
+  margin: auto auto 0;
+
+  @media (min-width: 600px) {
+    display: none;
+  }
+}
+
+.content {
+  width: 100%;
+  max-width: 24rem;
+  margin: 0 auto auto;
+
+  @media (min-width: 600px) {
+    margin: auto;
+  }
+
+  @include mat.form-field-overrides(
+    (
+      container-height: 40px,
+      container-vertical-padding: 8px,
+      outlined-container-shape: 8px,
+      outlined-outline-color: var(--mat-sys-on-surface),
+    )
+  );
+  @include mat.button-overrides(
+    (
+      filled-container-shape: 8px,
+    )
+  );
+}
+
+h1 {
+  margin: 0;
+  text-align: center;
+  font: var(--mat-sys-headline-small);
+  font-weight: 700;
+}

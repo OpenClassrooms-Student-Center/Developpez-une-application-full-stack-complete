@@ -8,7 +8,16 @@ import { User } from './user';
 export class Session {
   private readonly http = inject(HttpClient);
 
-  readonly user = signal<User | null>(null);
+  private readonly currentUser = signal<User | null>(null);
+
+  readonly user = this.currentUser.asReadonly();
+
+  /**
+   * Keeps the user the API has just logged in.
+   */
+  logIn(user: User): void {
+    this.currentUser.set(user);
+  }
 
   /**
    * Asks the API who is logged in, since the HttpOnly cookie cannot be read here.
@@ -17,7 +26,7 @@ export class Session {
   restore(): Observable<void> {
     return this.http.get<User>('/api/users/me').pipe(
       catchError(() => of(null)),
-      map((user) => this.user.set(user)),
+      map((user) => this.currentUser.set(user)),
     );
   }
 }
