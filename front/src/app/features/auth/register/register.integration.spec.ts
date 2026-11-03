@@ -68,4 +68,23 @@ describe('Register page', () => {
     expect(TestBed.inject(Session).user()).toEqual(user);
     expect(TestBed.inject(Router).url).toBe('/feed');
   });
+
+  it('explains what is wrong and sends nothing while a field is invalid', async () => {
+    // Arrange
+    const { fixture, http, page } = await openRegisterPage();
+    fillIn(page);
+    type(page, 'password', 'Deep-42');
+
+    // Act
+    submit(page);
+    await fixture.whenStable();
+
+    // Assert
+    http.expectNone('/api/auth/register');
+    const password = page.querySelector('#password') as HTMLInputElement;
+    const error = password.closest('mat-form-field')?.querySelector('mat-error');
+    expect(error?.textContent?.trim()).toBeTruthy();
+    expect(password.getAttribute('aria-invalid')).toBe('true');
+    expect(password.getAttribute('aria-describedby')).toContain(error?.id);
+  });
 });
