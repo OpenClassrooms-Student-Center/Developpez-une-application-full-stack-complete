@@ -13,9 +13,14 @@ html {
   );
   @include mat.theme-overrides(
     (
-      primary: #7451eb,
+      primary: #7550ec,
       label-large-weight: 600,
       surface: white,
+    )
+  );
+  @include mat.strong-focus-indicators(
+    (
+      border-color: var(--mat-sys-primary),
     )
   );
 }
