@@ -8,6 +8,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { Session } from '../../../core/session/session';
 import { emailRules, passwordRules, usernameRules } from '../../../shared/forms/account-rules';
+import { failureMessage, fieldErrors } from '../../../shared/forms/server-errors';
 import { AuthApi } from '../auth-api';
 import { AuthLayout } from '../auth-layout/auth-layout';
 import { RegisterRequest } from '../register-request';
@@ -24,6 +25,7 @@ export class Register {
   private readonly router = inject(Router);
 
   private readonly account = signal<RegisterRequest>({ username: '', email: '', password: '' });
+  protected readonly failure = signal('');
 
   protected readonly registerForm = form(
     this.account,
@@ -34,10 +36,17 @@ export class Register {
     },
     {
       submission: {
-        action: async () => {
-          const user = await firstValueFrom(this.authApi.register(this.account()));
-          this.session.logIn(user);
-          await this.router.navigateByUrl('/feed');
+        action: async (field) => {
+          try {
+            const user = await firstValueFrom(this.authApi.register(this.account()));
+            this.session.logIn(user);
+            await this.router.navigateByUrl('/feed');
+            return undefined;
+          } catch (error) {
+            const errors = fieldErrors(error, field);
+            this.failure.set(errors.length > 0 ? '' : failureMessage(error));
+            return errors;
+          }
         },
       },
     },

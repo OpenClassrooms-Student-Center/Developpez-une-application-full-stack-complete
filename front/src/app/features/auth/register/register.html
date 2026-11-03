@@ -30,6 +30,9 @@
       <mat-error>{{ registerForm.password().errors()[0]?.message }}</mat-error>
     </mat-form-field>
 
+    @if (failure()) {
+      <p class="failure" role="alert">{{ failure() }}</p>
+    }
     <button matButton="filled" type="submit" [disabled]="registerForm().submitting()">
       S’inscrire
     </button>

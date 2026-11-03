@@ -87,4 +87,80 @@ describe('Register page', () => {
     expect(password.getAttribute('aria-invalid')).toBe('true');
     expect(password.getAttribute('aria-describedby')).toContain(error?.id);
   });
+
+  it('shows under the field a value that is already taken', async () => {
+    // Arrange
+    const { fixture, http, page } = await openRegisterPage();
+    const message = 'Ce nom d’utilisateur est déjà pris.';
+    fillIn(page);
+
+    // Act
+    submit(page);
+    http
+      .expectOne('/api/auth/register')
+      .flush(
+        { detail: message, errors: { username: message } },
+        { status: 409, statusText: 'Conflict' },
+      );
+    await fixture.whenStable();
+
+    // Assert
+    const username = page.querySelector('#username') as HTMLInputElement;
+    const error = username.closest('mat-form-field')?.querySelector('mat-error');
+    expect(error?.textContent).toContain(message);
+    expect(TestBed.inject(Router).url).toBe('/register');
+  });
+
+  it('sends a taken value again only once the user has changed it', async () => {
+    // Arrange
+    const { fixture, http, page } = await openRegisterPage();
+    const message = 'Ce nom d’utilisateur est déjà pris.';
+    fillIn(page);
+    submit(page);
+    http
+      .expectOne('/api/auth/register')
+      .flush(
+        { detail: message, errors: { username: message } },
+        { status: 409, statusText: 'Conflict' },
+      );
+    await fixture.whenStable();
+
+    // Act: the same value again
+    submit(page);
+    await fixture.whenStable();
+
+    // Assert
+    http.expectNone('/api/auth/register');
+
+    // Act: another value
+    type(page, 'username', 'ford.prefect');
+    submit(page);
+    await fixture.whenStable();
+
+    // Assert
+    http.expectOne('/api/auth/register');
+  });
+
+  it('lets the user try again after a failure of the API', async () => {
+    // Arrange
+    const { fixture, http, page } = await openRegisterPage();
+    fillIn(page);
+
+    // Act: a first try
+    submit(page);
+    http
+      .expectOne('/api/auth/register')
+      .flush(null, { status: 500, statusText: 'Internal Server Error' });
+    await fixture.whenStable();
+
+    // Assert
+    expect(page.querySelector('[role="alert"]')?.textContent?.trim()).toBeTruthy();
+
+    // Act: a second try
+    submit(page);
+    await fixture.whenStable();
+
+    // Assert
+    http.expectOne('/api/auth/register');
+  });
 });
