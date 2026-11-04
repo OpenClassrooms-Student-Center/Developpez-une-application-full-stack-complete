@@ -12,7 +12,7 @@ The project documentation is in [docs/documentation-projet.md](docs/documentatio
 
 ## Back-end
 
-From the `back` folder, copy `.env.example` to `.env`, then fill in `MYSQL_PASSWORD` and `MYSQL_ROOT_PASSWORD`. Docker creates the database with these values on its first start.
+From the `back` folder, copy `.env.example` to `.env`, then fill in `MYSQL_PASSWORD`, `MYSQL_ROOT_PASSWORD` and `JWT_SECRET`. Docker creates the database with the first two on its first start. `JWT_SECRET` signs the login tokens: it must be at least 32 characters long, or the API refuses to start.
 
 Start the API on `http://localhost:8080`. This also starts MySQL and applies the database migrations:
 
