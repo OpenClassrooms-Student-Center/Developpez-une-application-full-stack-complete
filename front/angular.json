@@ -67,6 +67,10 @@
             },
             "development": {
               "buildTarget": "mdd-front:build:development"
+            },
+            "e2e": {
+              "buildTarget": "mdd-front:build:development",
+              "port": 4201
             }
           },
           "defaultConfiguration": "development"
@@ -89,7 +93,7 @@
         "cypress-run": {
           "builder": "@cypress/schematic:cypress",
           "options": {
-            "devServerTarget": "mdd-front:serve"
+            "devServerTarget": "mdd-front:serve:e2e"
           },
           "configurations": {
             "production": {
@@ -107,7 +111,7 @@
         "e2e": {
           "builder": "@cypress/schematic:cypress",
           "options": {
-            "devServerTarget": "mdd-front:serve",
+            "devServerTarget": "mdd-front:serve:e2e",
             "watch": true,
             "headless": false
           },

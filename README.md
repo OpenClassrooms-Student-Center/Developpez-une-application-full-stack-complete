@@ -25,6 +25,7 @@ On Windows, use `./mvnw.cmd` instead of `./mvnw`.
 Other commands:
 
 - `./mvnw verify`: runs the tests and checks the 80% coverage gate. The report is in `target/site/jacoco/index.html`.
+- `./mvnw spring-boot:test-run`: starts the API on `http://localhost:8080` with a throwaway MySQL container, for the end-to-end tests. Nothing is kept once it stops.
 - `./mvnw spotless:apply`: formats the Java code.
 
 ## Front-end
@@ -39,6 +40,6 @@ npm start
 Other commands:
 
 - `npm run test:coverage`: runs the unit and integration tests and checks the 80% coverage gate. The report is in `coverage/mdd-front/index.html`.
-- `npm run e2e:ci`: runs the Cypress tests in a headless browser.
+- `npm run e2e:ci`: runs the Cypress tests in a headless browser, on its own server on port 4201. Start the API with `./mvnw spring-boot:test-run` first.
 - `npm run lint`: checks the code with ESLint.
 - `npm run format`: formats the code with Prettier.
