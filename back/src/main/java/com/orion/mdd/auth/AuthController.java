@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Exposes the account creation and the login.
+ * Exposes the account creation, the login and the logout.
  */
 @RestController
 @RequestMapping("/api/auth")
@@ -77,6 +77,19 @@ public class AuthController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, authCookieService.create(user).toString())
                 .body(UserResponse.from(user));
+    }
+
+    /**
+     * Logs the user out by deleting the cookie, even when its token is no longer valid.
+     *
+     * @return an empty response with the cookie that deletes the token cookie
+     */
+    @PostMapping("/logout")
+    @ApiResponse(responseCode = "204", description = "Cookie deleted")
+    public ResponseEntity<Void> logout() {
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, authCookieService.clear().toString())
+                .build();
     }
 
 }

@@ -113,6 +113,42 @@ class LoginAndLogoutIntegrationTests {
         response.andExpect(status().isOk());
     }
 
+    @Test
+    void logsTheUserOutByClearingTheTokenCookie() throws Exception {
+        // Arrange
+        Cookie token = tokenCookie(logIn(EMAIL, PASSWORD).andReturn());
+
+        // Act
+        ResultActions response = logOut(token);
+
+        // Assert
+        response.andExpect(status().isNoContent());
+        assertThat(response.andReturn().getResponse().getHeader(HttpHeaders.SET_COOKIE))
+                .startsWith("mdd_token=;")
+                .contains("Max-Age=0", "Path=/", "Secure", "HttpOnly", "SameSite=Strict");
+    }
+
+    @Test
+    void logsOutEvenWithATokenCookieThatIsNoLongerValid() throws Exception {
+        // Act
+        ResultActions response = logOut(invalidTokenCookie());
+
+        // Assert
+        response.andExpect(status().isNoContent());
+    }
+
+    @Test
+    void refusesALogoutWithoutACsrfToken() throws Exception {
+        // Arrange: another site cannot log the user out
+        Cookie token = tokenCookie(logIn(EMAIL, PASSWORD).andReturn());
+
+        // Act
+        ResultActions response = mockMvc.perform(post("/api/auth/logout").cookie(token));
+
+        // Assert
+        response.andExpect(status().isForbidden());
+    }
+
     /** Sends what a browser sends: a first call gives the CSRF cookie, then the POST repeats it in a header. */
     private ResultActions logIn(String email, String password, Cookie... otherCookies) throws Exception {
         Cookie csrfCookie = csrfCookie();
@@ -123,6 +159,13 @@ class LoginAndLogoutIntegrationTests {
                 .content("""
                         {"email": "%s", "password": "%s"}
                         """.formatted(email, password)));
+    }
+
+    private ResultActions logOut(Cookie token) throws Exception {
+        Cookie csrfCookie = csrfCookie();
+        return mockMvc.perform(post("/api/auth/logout")
+                .cookie(csrfCookie, token)
+                .header("X-XSRF-TOKEN", csrfCookie.getValue()));
     }
 
     private Cookie csrfCookie() throws Exception {
