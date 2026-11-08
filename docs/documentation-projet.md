@@ -2,7 +2,7 @@
 
 - **Auteur** : Lisa Bergeron
 - **Version** : 0.1.0
-- **Date** : 30/10/2026
+- **Date** : 04/11/2026
 
 ## 1. Présentation générale du projet
 
@@ -16,17 +16,17 @@ Avant de l’ouvrir à un large public, ORION souhaite le tester avec un MVP (Mi
 
 | Fonctionnalité | Description | Statut |
 | --- | --- | --- |
-| Page d’accueil | Accéder aux formulaires d’inscription et de connexion | À venir |
-| Inscription | S’inscrire avec un e-mail, un nom d’utilisateur et un mot de passe | À venir |
-| Connexion | Se connecter avec son e-mail, se déconnecter | À venir |
-| Profil | Consulter et modifier son profil, supprimer son compte | À venir |
-| Thème | Consulter la liste de tous les thèmes | À venir |
-| Abonnement | S’abonner à un thème et s’en désabonner | À venir |
-| Fil d’actualité | Consulter et trier son fil d’actualité | À venir |
-| Article | Ajouter et consulter un article | À venir |
-| Commentaire | Commenter un article | À venir |
-| Pages légales | Consulter les mentions légales et la politique de confidentialité | À venir |
-| Responsive | Utiliser l’application sur mobile comme sur ordinateur | À venir |
+| Page d’accueil | Accéder aux formulaires d’inscription et de connexion | ✅ Terminé |
+| Inscription | S’inscrire avec un e-mail, un nom d’utilisateur et un mot de passe | ✅ Terminé |
+| Connexion | Se connecter avec son e-mail, se déconnecter | ⏳ À venir |
+| Profil | Consulter et modifier son profil, supprimer son compte | ⏳ À venir |
+| Thème | Consulter la liste de tous les thèmes | ⏳ À venir |
+| Abonnement | S’abonner à un thème et s’en désabonner | ⏳ À venir |
+| Fil d’actualité | Consulter et trier son fil d’actualité | ⏳ À venir |
+| Article | Ajouter et consulter un article | ⏳ À venir |
+| Commentaire | Commenter un article | ⏳ À venir |
+| Pages légales | Consulter les mentions légales et la politique de confidentialité | ⏳ À venir |
+| Responsive | Utiliser l’application sur mobile comme sur ordinateur | ⏳ À venir |
 
 ## 2. Architecture et conception technique
 
@@ -49,12 +49,12 @@ flowchart LR
 #### Organisation du code
 
 - **Dépôt** : un seul dépôt, trois dossiers `back/`, `front/` et `docs/`.
-- **Front** : généré avec Angular CLI ; `core` (session, intercepteurs, protection des routes, bandeau, pied de page), `shared` (composants réutilisables) et `features` (`home`, `auth`, `profile`, `topics`, `feed`, `posts`, `legal`).
-- **Back** : en couches (contrôleur → service → repository), rangé par fonctionnalité : `auth`, `user`, `topic` (thèmes et abonnements), `post` (articles et fil), `comment`, plus un dossier commun pour la sécurité, la configuration et la gestion des erreurs.
+- **Front** : généré avec Angular CLI ; `core` (session, intercepteurs, protection des routes, bandeau, pied de page), `shared` (code réutilisé par plusieurs fonctionnalités) et `features` (`home`, `auth`, `profile`, `topics`, `feed`, `posts`, `legal`).
+- **Back** : en couches (contrôleur → service → repository), rangé par fonctionnalité : `auth`, `user`, `topic` (thèmes et abonnements), `post` (articles et fil), `comment`, plus un dossier commun pour la sécurité, la validation et la gestion des erreurs.
 
 #### Conventions internes
 
-- **Style** : le guide de style d’Angular et les conventions Java (nommage, Javadoc).
+- **Style** : le guide de style d’Angular, avec le type dans le nom de chaque fichier (`register.component.ts`, `session.service.ts`, `user.model.ts`), réglé dans `angular.json` pour `ng generate`, et les conventions Java (nommage, Javadoc).
 - **Langues** : code, commits, README et documentation pour les développeurs en anglais, le code reprenant les termes du glossaire des specs (`user`, `topic`, `post`, `comment`, `subscription`, `feed`) ; interface et livrables en français.
 - **Git** : Git Flow (`main`, `develop`, branches `feature/*` et `docs/*`), Conventional Commits, fusion par pull request.
 - **Outils** : Spotless met en forme le code Java, Prettier celui du front, et angular-eslint vérifie les bonnes pratiques d’Angular.
@@ -79,6 +79,10 @@ Pour chaque choix structurant : type, documentation, objectif, justification et,
   - **Objectif** : partager l’état et rafraîchir l’affichage quand il change.
   - **Justification** : intégrés à Angular ; seul l’utilisateur connecté est partagé entre les pages, qui chargent chacune leurs données.
   - **Alternative écartée** : NgRx Store, que [sa documentation](https://ngrx.io/guide/store/why) réserve à un état partagé par de nombreux composants, modifié depuis plusieurs endroits ou conservé d’une page à l’autre ; NgRx SignalStore, lui aussi fondé sur les signals, prendrait le relais si une évolution l’exigeait.
+- **Signal Forms** (formulaires, [documentation](https://angular.dev/guide/forms/signals/overview))
+  - **Objectif** : décrire les champs, leur validation et leur envoi.
+  - **Justification** : API stable depuis Angular 22, fondée sur les signals déjà retenus et prise en charge par Angular Material ; les erreurs renvoyées par l’API s’y rattachent aux champs concernés.
+  - **Alternative écartée** : Reactive Forms, plus éprouvés, mais construits sur RxJS : deux modèles de réactivité dans les mêmes pages.
 - **Angular Material** (bibliothèque de composants, [documentation](https://material.angular.dev))
   - **Objectif** : disposer de composants prêts à l’emploi, accessibles et personnalisables selon les maquettes.
   - **Justification** : déjà dans le projet de départ ; maintenue par l’équipe d’Angular, au même rythme de versions.
@@ -99,7 +103,7 @@ Pour chaque choix structurant : type, documentation, objectif, justification et,
   - **Alternatives écartées** : la génération du schéma par Hibernate, qui ne sait ni renommer ni supprimer et ne garde aucun historique ; Liquibase, conçu pour plusieurs bases quand MDD n’en a qu’une, et dont le retour arrière est remplacé ici par une migration corrective.
 - **Records Java et Lombok** (réduction du code répétitif, [Lombok](https://projectlombok.org))
   - **Objectif** : ne pas écrire à la main constructeurs, getters et setters.
-  - **Justification** : les DTO sont des records, construits depuis l’entité par une méthode `from` ; Lombok est réservé aux entités JPA, qui ne peuvent pas être des records.
+  - **Justification** : les DTO sont des records, construits depuis l’entité par une méthode `from` ; Lombok est réservé aux classes qui ne peuvent pas être des records : les entités JPA et les exceptions.
   - **Alternative écartée** : MapStruct, superflu pour une dizaine de DTO.
 - **springdoc-openapi** (documentation de l’API, [documentation](https://springdoc.org))
   - **Objectif** : générer depuis le code une documentation interactive de l’API (Swagger UI).
@@ -184,7 +188,7 @@ Un utilisateur ne s’abonne qu’une fois à un thème : la clé primaire de `s
 
 #### API
 
-L’API REST, servie sous `/api`, échange du JSON. L’inscription et la connexion déposent le jeton JWT, valable 24 heures, dans le cookie HttpOnly `mdd_token` ; toutes les autres routes l’exigent. Chaque requête `POST`, `PUT` ou `DELETE` porte aussi l’en-tête `X-XSRF-TOKEN`, qu’Angular recopie depuis le cookie `XSRF-TOKEN`. Dans la liste, le corps de la requête figure entre parenthèses, la réponse après la flèche.
+L’API REST, servie sous `/api`, échange du JSON. L’inscription et la connexion déposent le jeton JWT, valable 24 heures, dans le cookie HttpOnly `mdd_token` ; toutes les autres routes l’exigent. Chaque requête `POST`, `PUT` ou `DELETE` porte aussi l’en-tête `X-XSRF-TOKEN`, qu’Angular recopie depuis le cookie `XSRF-TOKEN`. Ce cookie arrive d’abord avec la réponse à `GET /api/users/me`, appelée au démarrage du front-end, même quand elle vaut 401. Dans la liste, le corps de la requête figure entre parenthèses, la réponse après la flèche.
 
 - **`POST /api/auth/register`** (`username`, `email`, `password`) : inscrit et connecte l’utilisateur → 201, profil et cookie.
 - **`POST /api/auth/login`** (`email`, `password`) : connecte l’utilisateur → 200, profil et cookie.
@@ -209,8 +213,8 @@ Cookie: XSRF-TOKEN=8f3a2c51...
 X-XSRF-TOKEN: 8f3a2c51...
 
 {
-  "email": "jdupont@example.com",
-  "password": "Exemple-2026"
+  "email": "arthur.dent@example.com",
+  "password": "Dont-Panic-42"
 }
 ```
 
@@ -220,19 +224,19 @@ Set-Cookie: mdd_token=eyJhbGciOiJIUzI1NiJ9...; Max-Age=86400; Path=/; Secure; Ht
 Content-Type: application/json
 
 {
-  "id": 1,
-  "username": "jdupont",
-  "email": "jdupont@example.com"
+  "id": 42,
+  "username": "arthur.dent",
+  "email": "arthur.dent@example.com"
 }
 ```
 
 Les erreurs suivent le format Problem Details (RFC 9457), que Spring produit sans bibliothèque supplémentaire :
 
-- **400** : données invalides, avec le message de chaque champ en erreur.
+- **400** : données invalides, avec le message de chaque champ en erreur dans `errors`.
 - **401** : utilisateur non connecté, jeton expiré ou invalide ; à la connexion, identifiants incorrects, sans préciser lequel est faux.
 - **403** : jeton CSRF absent ou incorrect.
 - **404** : thème ou article introuvable.
-- **409** : nom d’utilisateur ou e-mail déjà pris.
+- **409** : nom d’utilisateur ou e-mail déjà pris, avec le champ concerné dans `errors`.
 
 Exemple d’inscription avec un nom d’utilisateur déjà pris :
 
@@ -241,11 +245,13 @@ HTTP/1.1 409 Conflict
 Content-Type: application/problem+json
 
 {
-  "type": "about:blank",
   "title": "Conflict",
   "status": 409,
   "detail": "Ce nom d’utilisateur est déjà pris.",
-  "instance": "/api/auth/register"
+  "instance": "/api/auth/register",
+  "errors": {
+    "username": "Ce nom d’utilisateur est déjà pris."
+  }
 }
 ```
 
@@ -259,7 +265,7 @@ Les tests de chaque fonctionnalité sont écrits avant son code (TDD) et suivent
 - **Intégration, back-end** : Spring Boot Test et [Testcontainers](https://testcontainers.com). Portée : chaque endpoint, de la requête à un vrai MySQL 9.7 lancé dans un conteneur, migrations Flyway comprises. Ces tests vérifient aussi les règles portées par la base, comme l’unicité et la suppression en cascade. Une base en mémoire comme H2 serait plus rapide, mais ne se comporte pas exactement comme MySQL.
 - **Unitaires, front-end** : [Vitest](https://vitest.dev), proposé par défaut par Angular 22. Portée : un composant ou un service pris seul.
 - **Intégration, front-end** : Vitest. Portée : une page dans la vraie application, avec ses routes, ses protections, ses intercepteurs et ses services ; seules les réponses de l’API sont simulées.
-- **De bout en bout** : [Cypress](https://docs.cypress.io). Portée : les parcours complets de l’utilisateur dans le navigateur, sur la vraie API.
+- **De bout en bout** : [Cypress](https://docs.cypress.io). Portée : les parcours complets de l’utilisateur dans le navigateur, sur la vraie API et une base MySQL recréée à chaque lancement.
 
 La couverture est contrôlée à 80 % des lignes et des branches, avec [JaCoCo](https://www.jacoco.org/jacoco/) pour le back-end et Vitest pour le front-end : en dessous de ce seuil, `./mvnw verify` et `npm run test:coverage` échouent. Sont exclus `MddApiApplication`, qui ne fait que démarrer l’application, et le code généré par Lombok.
 

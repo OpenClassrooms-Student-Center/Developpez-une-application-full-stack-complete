@@ -13,3 +13,8 @@ indent_size = 2
 
 [*.md]
 trim_trailing_whitespace = false
+
+[*.java]
+ij_continuation_indent_size = 8
+ij_java_class_count_to_use_import_on_demand = 999
+ij_java_names_count_to_use_import_on_demand = 999

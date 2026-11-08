@@ -6,4 +6,13 @@ describe('Home page', () => {
     cy.contains('a', 'Se connecter').should('be.visible').and('have.attr', 'href', '/login');
     cy.contains('a', 'S’inscrire').should('be.visible').and('have.attr', 'href', '/register');
   });
+
+  it('leads to the registration page', () => {
+    cy.visit('/');
+
+    cy.contains('a', 'S’inscrire').click();
+
+    cy.location('pathname').should('eq', '/register');
+    cy.contains('h1', 'Inscription').should('be.visible');
+  });
 });
