@@ -24,9 +24,16 @@ export const routes: Routes = [
       import('./features/auth/register/register.component').then((m) => m.Register),
   },
   {
-    path: 'feed',
-    title: 'Fil d’actualité – MDD',
+    path: '',
     canActivate: [loggedInGuard],
-    loadComponent: () => import('./features/feed/feed.component').then((m) => m.Feed),
+    loadComponent: () =>
+      import('./core/layout/main-layout/main-layout.component').then((m) => m.MainLayout),
+    children: [
+      {
+        path: 'feed',
+        title: 'Fil d’actualité – MDD',
+        loadComponent: () => import('./features/feed/feed.component').then((m) => m.Feed),
+      },
+    ],
   },
 ];

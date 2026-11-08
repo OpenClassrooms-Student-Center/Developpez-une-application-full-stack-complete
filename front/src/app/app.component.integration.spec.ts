@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 
 import { App } from './app.component';
 import { appConfig } from './app.config';
+import { Session } from './core/session/session.service';
 import { User } from './core/session/user.model';
 
 describe('App', () => {
@@ -50,6 +51,26 @@ describe('App', () => {
       expect(TestBed.inject(Router).url).toBe('/feed');
     },
   );
+
+  it('logs the user out from the header and goes back home', async () => {
+    // Arrange
+    const fixture = await open('/feed', user);
+    const page = fixture.nativeElement as HTMLElement;
+    const logOut = [...page.querySelectorAll('header button')].find((button) =>
+      button.textContent?.includes('Se déconnecter'),
+    ) as HTMLButtonElement;
+
+    // Act
+    logOut.click();
+    const request = TestBed.inject(HttpTestingController).expectOne('/api/auth/logout');
+    request.flush(null, { status: 204, statusText: 'No Content' });
+    await fixture.whenStable();
+
+    // Assert
+    expect(request.request.method).toBe('POST');
+    expect(TestBed.inject(Session).user()).toBeNull();
+    expect(TestBed.inject(Router).url).toBe('/');
+  });
 
   it('sends a visitor from the feed to the login page', async () => {
     // Act
