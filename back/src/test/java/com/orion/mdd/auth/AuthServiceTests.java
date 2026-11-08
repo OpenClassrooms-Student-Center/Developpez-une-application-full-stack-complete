@@ -1,14 +1,19 @@
 package com.orion.mdd.auth;
 
 import com.orion.mdd.common.exception.ConflictException;
+import com.orion.mdd.common.exception.InvalidCredentialsException;
 import com.orion.mdd.user.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class AuthServiceTests {
@@ -27,6 +32,17 @@ class AuthServiceTests {
         assertThatThrownBy(() -> authService.register(request))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage("Ce nom d’utilisateur ou cette adresse e-mail est déjà pris.");
+    }
+
+    @Test
+    void comparesAHashEvenWhenTheEmailIsUnknown() {
+        // Arrange: no account has this e-mail address
+        LoginRequest request = new LoginRequest("ford.prefect@example.com", "Dont-Panic-42");
+        when(userRepository.findByEmail(request.email())).thenReturn(Optional.empty());
+
+        // Act and assert: the time spent hashing does not tell that the account is missing
+        assertThatThrownBy(() -> authService.login(request)).isInstanceOf(InvalidCredentialsException.class);
+        verify(passwordEncoder).matches(eq(request.password()), any());
     }
 
 }

@@ -1,24 +1,29 @@
 package com.orion.mdd.auth;
 
 import com.orion.mdd.common.exception.ConflictException;
+import com.orion.mdd.common.exception.InvalidCredentialsException;
 import com.orion.mdd.user.User;
 import com.orion.mdd.user.UserRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 /**
- * Creates the accounts.
+ * Creates the accounts and checks the credentials.
  */
 @Service
 public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final String unknownUserHash;
 
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.unknownUserHash = passwordEncoder.encode("no account has this password");
     }
 
     /**
@@ -48,6 +53,26 @@ public class AuthService {
         } catch (DataIntegrityViolationException exception) {
             throw new ConflictException("Ce nom d’utilisateur ou cette adresse e-mail est déjà pris.");
         }
+    }
+
+    /**
+     * Finds the user whose e-mail address and password match.
+     *
+     * <p>
+     * An unknown e-mail address still costs a hash comparison, so that the response time does not tell which
+     * addresses have an account.
+     *
+     * @param request
+     *            the credentials
+     * @return the user
+     * @throws InvalidCredentialsException
+     *             if no account has this e-mail address and password
+     */
+    public User login(LoginRequest request) {
+        Optional<User> user = userRepository.findByEmail(request.email());
+        String hash = user.map(User::getPassword).orElse(unknownUserHash);
+        boolean matches = passwordEncoder.matches(request.password(), hash);
+        return user.filter(_ -> matches).orElseThrow(InvalidCredentialsException::new);
     }
 
 }

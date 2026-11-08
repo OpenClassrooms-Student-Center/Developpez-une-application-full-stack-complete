@@ -1,0 +1,29 @@
+@use '@angular/material' as mat;
+
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--mat-sys-on-surface);
+
+  img {
+    display: block;
+    width: 140px;
+    height: auto;
+  }
+
+  @media (min-width: 600px) {
+    padding: 0.75rem 2.5rem;
+  }
+}
+
+.logout {
+  @include mat.button-overrides(
+    (
+      text-label-text-color: #a40f0f,
+      text-state-layer-color: #a40f0f,
+      text-ripple-color: rgb(164 15 15 / 12%),
+    )
+  );
+}

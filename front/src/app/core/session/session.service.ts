@@ -20,6 +20,15 @@ export class Session {
   }
 
   /**
+   * Asks the API to delete the cookie, then forgets the user.
+   */
+  logOut(): Observable<void> {
+    return this.http
+      .post<void>('/api/auth/logout', null)
+      .pipe(map(() => this.currentUser.set(null)));
+  }
+
+  /**
    * Asks the API who is logged in, since the HttpOnly cookie cannot be read here.
    * The response, even a 401, also brings the CSRF cookie that the first POST needs.
    */

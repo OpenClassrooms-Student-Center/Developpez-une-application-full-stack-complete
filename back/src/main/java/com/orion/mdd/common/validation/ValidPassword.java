@@ -2,7 +2,6 @@ package com.orion.mdd.common.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
 import java.lang.annotation.Documented;
@@ -15,7 +14,7 @@ import java.lang.annotation.Target;
  * A password: from 8 to 64 characters, with a digit, a lowercase letter, an uppercase letter and a
  * character that is neither a letter nor a digit. Each broken rule reports its own message.
  */
-@NotBlank(message = "Le mot de passe est obligatoire.")
+@RequiredPassword
 @Pattern(regexp = "(?=.*\\d)(?=.*\\p{Ll})(?=.*\\p{Lu})(?=.*[^\\p{L}\\p{N}]).{8,64}",
         message = "De 8 à 64 caractères, avec un chiffre, une minuscule, une majuscule et un caractère spécial.")
 @Constraint(validatedBy = {})

@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.Instant;
 
 /**
@@ -44,12 +45,30 @@ public class AuthCookieService {
         JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
         String token = jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
 
-        return ResponseCookie.from(SecurityConfig.TOKEN_COOKIE, token)
+        return tokenCookie(token, jwtProperties.expiration());
+    }
+
+    /**
+     * Builds an empty cookie that the browser deletes at once. The token itself stays valid until it expires: the
+     * API keeps no list of the tokens it issued.
+     *
+     * @return the cookie that replaces the token cookie
+     */
+    public ResponseCookie clear() {
+        return tokenCookie("", Duration.ZERO);
+    }
+
+    /**
+     * A browser deletes a cookie only if the new one has the same name, path and attributes, so both cookies are
+     * built here.
+     */
+    private static ResponseCookie tokenCookie(String value, Duration maxAge) {
+        return ResponseCookie.from(SecurityConfig.TOKEN_COOKIE, value)
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("Strict")
                 .path("/")
-                .maxAge(jwtProperties.expiration())
+                .maxAge(maxAge)
                 .build();
     }
 

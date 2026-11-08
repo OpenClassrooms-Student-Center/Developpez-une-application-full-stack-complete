@@ -69,8 +69,9 @@ Règles communes :
 
 - **Mots de passe et jetons** : mots de passe hachés avec Argon2id ; ni mot de passe ni jeton n’apparaît dans les réponses, les journaux ou les messages d’erreur.
 - **E-mail** : identifiant de connexion, il n’est jamais renvoyé avec les articles ou les commentaires de son auteur.
+- **Connexion** : un e-mail inconnu et un mauvais mot de passe reçoivent la même réponse, dans le même temps, pour ne pas révéler quelles adresses ont un compte.
 - **Auteur et date** : fixés par le back-end, jamais par le front-end.
-- **Accès** : l’API est réservée aux utilisateurs connectés, sauf l’inscription et la connexion ; chacun ne peut modifier que son profil et ses abonnements, et ne supprimer que son compte.
+- **Accès** : l’API est réservée aux utilisateurs connectés, sauf l’inscription, la connexion et la déconnexion ; chacun ne peut modifier que son profil et ses abonnements, et ne supprimer que son compte.
 - **Suppression du compte** : elle efface en cascade ses abonnements, ses commentaires et ses articles, avec leurs commentaires. Les conserver sans auteur n’aurait de sens que dans un fil de discussion, où chaque message répond au précédent ; ici, un commentaire ne répond jamais à un autre.
 - **Injection SQL** : empêchée par les requêtes paramétrées de Spring Data JPA.
 - **XSS** : Angular affiche les contenus comme du texte, si bien qu’un script glissé dans un article ou un commentaire ne s’exécute pas.

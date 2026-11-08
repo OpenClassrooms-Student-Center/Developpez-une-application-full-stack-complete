@@ -1,4 +1,4 @@
-import { email, maxLength, pattern, required, schema } from '@angular/forms/signals';
+import { apply, email, maxLength, pattern, required, schema } from '@angular/forms/signals';
 
 const USERNAME_PATTERN = /^[A-Za-z0-9._-]{3,30}$/;
 const PASSWORD_PATTERN = /^(?=.*\d)(?=.*\p{Ll})(?=.*\p{Lu})(?=.*[^\p{L}\p{N}]).{8,64}$/u;
@@ -23,11 +23,18 @@ export const emailRules = schema<string>((path) => {
 });
 
 /**
+ * A password that must be given. The login checks only this: the other rules apply when a password is chosen.
+ */
+export const requiredPasswordRules = schema<string>((path) => {
+  required(path, { message: 'Le mot de passe est obligatoire.' });
+});
+
+/**
  * From 8 to 64 characters, with a digit, a lowercase letter, an uppercase letter and a character
  * that is neither a letter nor a digit, as the API requires.
  */
 export const passwordRules = schema<string>((path) => {
-  required(path, { message: 'Le mot de passe est obligatoire.' });
+  apply(path, requiredPasswordRules);
   pattern(path, PASSWORD_PATTERN, {
     message:
       'De 8 à 64 caractères, avec un chiffre, une minuscule, une majuscule et un caractère spécial.',

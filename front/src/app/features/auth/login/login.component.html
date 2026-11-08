@@ -1,0 +1,28 @@
+<app-auth-layout heading="Se connecter">
+  <form class="form" [formRoot]="loginForm">
+    <label for="email">Adresse e-mail</label>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <input matInput id="email" type="email" autocomplete="email" [formField]="loginForm.email" />
+      <mat-error>{{ loginForm.email().errors()[0]?.message }}</mat-error>
+    </mat-form-field>
+
+    <label for="password">Mot de passe</label>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <input
+        matInput
+        id="password"
+        type="password"
+        autocomplete="current-password"
+        [formField]="loginForm.password"
+      />
+      <mat-error>{{ loginForm.password().errors()[0]?.message }}</mat-error>
+    </mat-form-field>
+
+    @if (failure()) {
+      <p class="failure" role="alert">{{ failure() }}</p>
+    }
+    <button matButton="filled" type="submit" [disabled]="loginForm().submitting()">
+      Se connecter
+    </button>
+  </form>
+</app-auth-layout>

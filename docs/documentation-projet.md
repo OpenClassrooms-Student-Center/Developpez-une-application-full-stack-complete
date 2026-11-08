@@ -2,7 +2,7 @@
 
 - **Auteur** : Lisa Bergeron
 - **Version** : 0.1.0
-- **Date** : 04/11/2026
+- **Date** : 08/11/2026
 
 ## 1. Présentation générale du projet
 
@@ -18,7 +18,7 @@ Avant de l’ouvrir à un large public, ORION souhaite le tester avec un MVP (Mi
 | --- | --- | --- |
 | Page d’accueil | Accéder aux formulaires d’inscription et de connexion | ✅ Terminé |
 | Inscription | S’inscrire avec un e-mail, un nom d’utilisateur et un mot de passe | ✅ Terminé |
-| Connexion | Se connecter avec son e-mail, se déconnecter | ⏳ À venir |
+| Connexion | Se connecter avec son e-mail, se déconnecter | ✅ Terminé |
 | Profil | Consulter et modifier son profil, supprimer son compte | ⏳ À venir |
 | Thème | Consulter la liste de tous les thèmes | ⏳ À venir |
 | Abonnement | S’abonner à un thème et s’en désabonner | ⏳ À venir |
@@ -188,7 +188,7 @@ Un utilisateur ne s’abonne qu’une fois à un thème : la clé primaire de `s
 
 #### API
 
-L’API REST, servie sous `/api`, échange du JSON. L’inscription et la connexion déposent le jeton JWT, valable 24 heures, dans le cookie HttpOnly `mdd_token` ; toutes les autres routes l’exigent. Chaque requête `POST`, `PUT` ou `DELETE` porte aussi l’en-tête `X-XSRF-TOKEN`, qu’Angular recopie depuis le cookie `XSRF-TOKEN`. Ce cookie arrive d’abord avec la réponse à `GET /api/users/me`, appelée au démarrage du front-end, même quand elle vaut 401. Dans la liste, le corps de la requête figure entre parenthèses, la réponse après la flèche.
+L’API REST, servie sous `/api`, échange du JSON. L’inscription et la connexion déposent le jeton JWT, valable 24 heures, dans le cookie HttpOnly `mdd_token`. Les routes `/api/auth` ignorent ce cookie, pour qu’un jeton devenu invalide n’empêche jamais de se reconnecter ; toutes les autres l’exigent. Chaque requête `POST`, `PUT` ou `DELETE` porte aussi l’en-tête `X-XSRF-TOKEN`, qu’Angular recopie depuis le cookie `XSRF-TOKEN`. Ce cookie arrive d’abord avec la réponse à `GET /api/users/me`, appelée au démarrage du front-end, même quand elle vaut 401. Dans la liste, le corps de la requête figure entre parenthèses, la réponse après la flèche.
 
 - **`POST /api/auth/register`** (`username`, `email`, `password`) : inscrit et connecte l’utilisateur → 201, profil et cookie.
 - **`POST /api/auth/login`** (`email`, `password`) : connecte l’utilisateur → 200, profil et cookie.
