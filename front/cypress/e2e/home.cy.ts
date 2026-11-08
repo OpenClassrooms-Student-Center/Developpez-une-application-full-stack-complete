@@ -7,6 +7,15 @@ describe('Home page', () => {
     cy.contains('a', 'S’inscrire').should('be.visible').and('have.attr', 'href', '/register');
   });
 
+  it('leads to the login page', () => {
+    cy.visit('/');
+
+    cy.contains('a', 'Se connecter').click();
+
+    cy.location('pathname').should('eq', '/login');
+    cy.contains('h1', 'Se connecter').should('be.visible');
+  });
+
   it('leads to the registration page', () => {
     cy.visit('/');
 
