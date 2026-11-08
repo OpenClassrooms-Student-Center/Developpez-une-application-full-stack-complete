@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  * Security rules of the API: a valid token in the {@value #TOKEN_COOKIE} cookie is required everywhere except
- * registration, the Swagger documentation and the error page, and every write request needs a CSRF token.
+ * registration, login, the Swagger documentation and the error page, and every write request needs a CSRF token.
  */
 @Configuration
 public class SecurityConfig {
@@ -67,7 +67,7 @@ public class SecurityConfig {
                         .withObjectPostProcessor(protectRequestsWithAToken()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated())

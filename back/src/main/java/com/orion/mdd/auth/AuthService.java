@@ -1,6 +1,7 @@
 package com.orion.mdd.auth;
 
 import com.orion.mdd.common.exception.ConflictException;
+import com.orion.mdd.common.exception.InvalidCredentialsException;
 import com.orion.mdd.user.User;
 import com.orion.mdd.user.UserRepository;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -8,7 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
- * Creates the accounts.
+ * Creates the accounts and checks the credentials.
  */
 @Service
 public class AuthService {
@@ -48,6 +49,21 @@ public class AuthService {
         } catch (DataIntegrityViolationException exception) {
             throw new ConflictException("Ce nom d’utilisateur ou cette adresse e-mail est déjà pris.");
         }
+    }
+
+    /**
+     * Finds the user whose e-mail address and password match.
+     *
+     * @param request
+     *            the credentials
+     * @return the user
+     * @throws InvalidCredentialsException
+     *             if no account has this e-mail address and password
+     */
+    public User login(LoginRequest request) {
+        return userRepository.findByEmail(request.email())
+                .filter(user -> passwordEncoder.matches(request.password(), user.getPassword()))
+                .orElseThrow(InvalidCredentialsException::new);
     }
 
 }

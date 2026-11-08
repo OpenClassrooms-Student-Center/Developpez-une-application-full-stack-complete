@@ -42,6 +42,16 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
+     * Answers 401 when the credentials are wrong, without saying which one.
+     *
+     * @return the Problem Details
+     */
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ProblemDetail handleInvalidCredentials() {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "E-mail ou mot de passe incorrect.");
+    }
+
+    /**
      * Answers 401 when the account of a token no longer exists: its owner counts as logged out.
      *
      * @return the Problem Details
