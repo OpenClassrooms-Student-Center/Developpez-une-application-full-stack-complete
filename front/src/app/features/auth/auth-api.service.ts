@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { User } from '../../core/session/user';
-import { RegisterRequest } from './register-request';
+import { User } from '../../core/session/user.model';
+import { RegisterRequest } from './register-request.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthApi {

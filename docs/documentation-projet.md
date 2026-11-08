@@ -54,7 +54,7 @@ flowchart LR
 
 #### Conventions internes
 
-- **Style** : le guide de style d’Angular et les conventions Java (nommage, Javadoc).
+- **Style** : le guide de style d’Angular, avec le type dans le nom de chaque fichier (`register.component.ts`, `session.service.ts`, `user.model.ts`), réglé dans `angular.json` pour `ng generate`, et les conventions Java (nommage, Javadoc).
 - **Langues** : code, commits, README et documentation pour les développeurs en anglais, le code reprenant les termes du glossaire des specs (`user`, `topic`, `post`, `comment`, `subscription`, `feed`) ; interface et livrables en français.
 - **Git** : Git Flow (`main`, `develop`, branches `feature/*` et `docs/*`), Conventional Commits, fusion par pull request.
 - **Outils** : Spotless met en forme le code Java, Prettier celui du front, et angular-eslint vérifie les bonnes pratiques d’Angular.

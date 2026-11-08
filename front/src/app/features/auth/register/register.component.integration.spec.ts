@@ -3,9 +3,9 @@ import { ApplicationInitStatus } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 
-import { App } from '../../../app';
+import { App } from '../../../app.component';
 import { appConfig } from '../../../app.config';
-import { Session } from '../../../core/session/session';
+import { Session } from '../../../core/session/session.service';
 
 interface RegisterPage {
   fixture: ComponentFixture<App>;

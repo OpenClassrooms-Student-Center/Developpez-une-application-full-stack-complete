@@ -6,18 +6,22 @@ import { MatInput } from '@angular/material/input';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
-import { Session } from '../../../core/session/session';
-import { emailRules, passwordRules, usernameRules } from '../../../shared/forms/account-rules';
-import { failureMessage, fieldErrors } from '../../../shared/forms/server-errors';
-import { AuthApi } from '../auth-api';
-import { AuthLayout } from '../auth-layout/auth-layout';
-import { RegisterRequest } from '../register-request';
+import { Session } from '../../../core/session/session.service';
+import {
+  emailRules,
+  passwordRules,
+  usernameRules,
+} from '../../../shared/forms/account-rules.schema';
+import { failureMessage, fieldErrors } from '../../../shared/forms/server-errors.util';
+import { AuthApi } from '../auth-api.service';
+import { AuthLayout } from '../auth-layout/auth-layout.component';
+import { RegisterRequest } from '../register-request.model';
 
 @Component({
   imports: [AuthLayout, FormField, FormRoot, MatButton, MatError, MatFormField, MatInput],
   selector: 'app-register',
-  styleUrl: './register.scss',
-  templateUrl: './register.html',
+  styleUrl: './register.component.scss',
+  templateUrl: './register.component.html',
 })
 export class Register {
   private readonly authApi = inject(AuthApi);

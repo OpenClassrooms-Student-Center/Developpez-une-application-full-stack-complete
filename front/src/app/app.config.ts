@@ -8,7 +8,7 @@ import {
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
-import { Session } from './core/session/session';
+import { Session } from './core/session/session.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [

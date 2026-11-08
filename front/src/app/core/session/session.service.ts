@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { catchError, map, Observable, of } from 'rxjs';
 
-import { User } from './user';
+import { User } from './user.model';
 
 @Injectable({ providedIn: 'root' })
 export class Session {
