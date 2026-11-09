@@ -1,6 +1,7 @@
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ApplicationInitStatus } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { Router } from '@angular/router';
 
 import { App } from '../app/app.component';
@@ -15,11 +16,16 @@ export interface OpenedApp {
 
 /**
  * Starts the real application, with its routes, guards and services, as a visitor (null) or as
- * a logged-in user, then opens a URL. Only the HTTP back end is simulated.
+ * a logged-in user, then opens a URL. Only the HTTP back end is simulated, and Material's
+ * animations are turned off: a dialog closes at once instead of after a timer the test cannot see.
  */
 export async function openApp(url: string, user: User | null): Promise<OpenedApp> {
   TestBed.configureTestingModule({
-    providers: [...appConfig.providers, provideHttpClientTesting()],
+    providers: [
+      ...appConfig.providers,
+      provideHttpClientTesting(),
+      { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
+    ],
   });
   const http = TestBed.inject(HttpTestingController);
   const me = http.expectOne('/api/users/me');

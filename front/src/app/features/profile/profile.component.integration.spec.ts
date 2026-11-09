@@ -115,6 +115,76 @@ describe('Profile page', () => {
     http.expectOne('/api/users/me');
   });
 
+  describe('account deletion', () => {
+    function button(root: ParentNode, text: string): HTMLButtonElement {
+      return [...root.querySelectorAll('button')].find((candidate) =>
+        candidate.textContent?.includes(text),
+      ) as HTMLButtonElement;
+    }
+
+    async function askForDeletion(): Promise<Awaited<ReturnType<typeof openApp>>> {
+      const opened = await openApp('/profile', user);
+      button(opened.page, 'Supprimer mon compte').click();
+      await opened.fixture.whenStable();
+      return opened;
+    }
+
+    it('deletes the account once confirmed, then goes back home', async () => {
+      // Arrange
+      const { fixture, http } = await askForDeletion();
+      const dialog = document.querySelector('mat-dialog-container') as HTMLElement;
+
+      // Act
+      button(dialog, 'Supprimer').click();
+      await fixture.whenStable();
+      const request = http.expectOne('/api/users/me');
+      request.flush(null, { status: 204, statusText: 'No Content' });
+      // The first wait lets the deletion resume after the response, the second one waits for
+      // the navigation it then starts
+      await fixture.whenStable();
+      await fixture.whenStable();
+
+      // Assert
+      expect(request.request.method).toBe('DELETE');
+      expect(TestBed.inject(Session).user()).toBeNull();
+      expect(TestBed.inject(Router).url).toBe('/');
+    });
+
+    it('keeps the user logged in and says why when the deletion fails', async () => {
+      // Arrange
+      const { fixture, http } = await askForDeletion();
+      const dialog = document.querySelector('mat-dialog-container') as HTMLElement;
+
+      // Act
+      button(dialog, 'Supprimer').click();
+      await fixture.whenStable();
+      http
+        .expectOne('/api/users/me')
+        .flush(null, { status: 500, statusText: 'Internal Server Error' });
+      await fixture.whenStable();
+      await fixture.whenStable();
+
+      // Assert
+      expect(TestBed.inject(Session).user()).toEqual(user);
+      expect(TestBed.inject(Router).url).toBe('/profile');
+      expect(document.querySelector('mat-snack-bar-container')?.textContent?.trim()).toBeTruthy();
+    });
+
+    it('keeps the account when the user cancels', async () => {
+      // Arrange
+      const { fixture, http } = await askForDeletion();
+      const dialog = document.querySelector('mat-dialog-container') as HTMLElement;
+
+      // Act
+      button(dialog, 'Annuler').click();
+      await fixture.whenStable();
+
+      // Assert
+      http.expectNone('/api/users/me');
+      expect(TestBed.inject(Router).url).toBe('/profile');
+    });
+  });
+
   describe('password form', () => {
     function passwordForm(page: HTMLElement): HTMLElement {
       return page.querySelector('app-password-form') as HTMLElement;

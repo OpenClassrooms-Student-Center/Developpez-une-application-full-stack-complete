@@ -1,0 +1,18 @@
+@use 'danger-button';
+
+:host {
+  display: block;
+  margin-top: 3rem;
+}
+
+.delete {
+  @include danger-button.text;
+
+  display: block;
+  margin: 0 auto;
+}
+
+// « Supprimer », in the dialog
+.confirm {
+  @include danger-button.filled;
+}

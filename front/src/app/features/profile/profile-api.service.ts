@@ -17,4 +17,11 @@ export class ProfileApi {
   changePassword(request: PasswordChangeRequest): Observable<void> {
     return this.http.put<void>('/api/users/me/password', request);
   }
+
+  /**
+   * Deletes the account. The response also deletes the token cookie.
+   */
+  deleteAccount(): Observable<void> {
+    return this.http.delete<void>('/api/users/me');
+  }
 }

@@ -1,4 +1,5 @@
 @use '@angular/material' as mat;
+@use 'danger-button';
 
 .banner {
   display: flex;
@@ -19,13 +20,7 @@
 }
 
 .logout {
-  @include mat.button-overrides(
-    (
-      text-label-text-color: #a40f0f,
-      text-state-layer-color: #a40f0f,
-      text-ripple-color: rgb(164 15 15 / 12%),
-    )
-  );
+  @include danger-button.text;
 }
 
 nav {
