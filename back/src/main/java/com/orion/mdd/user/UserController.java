@@ -8,6 +8,8 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,8 +44,28 @@ public class UserController {
             content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE,
                     schema = @Schema(implementation = ProblemDetail.class)))
     public UserResponse me(@AuthenticationPrincipal Jwt jwt) {
-        String subject = Objects.requireNonNull(jwt.getSubject());
-        return UserResponse.from(userService.getCurrentUser(Long.valueOf(subject)));
+        return UserResponse.from(userService.getCurrentUser(userId(jwt)));
+    }
+
+    /**
+     * Changes the profile of the logged-in user. The token stays valid, since it names the account by its id.
+     *
+     * @param jwt
+     *            the verified token
+     * @param request
+     *            the new values, with a {@code null} password to keep the current one
+     * @return the updated profile
+     */
+    @PutMapping("/me")
+    @ApiResponse(responseCode = "200", description = "Profile updated",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = UserResponse.class)))
+    public UserResponse updateMe(@AuthenticationPrincipal Jwt jwt, @RequestBody ProfileRequest request) {
+        return UserResponse.from(userService.updateProfile(userId(jwt), request));
+    }
+
+    private static Long userId(Jwt jwt) {
+        return Long.valueOf(Objects.requireNonNull(jwt.getSubject()));
     }
 
 }
