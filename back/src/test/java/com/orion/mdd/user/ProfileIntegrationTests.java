@@ -6,6 +6,8 @@ import com.orion.mdd.auth.AuthCookieService;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -139,6 +141,21 @@ class ProfileIntegrationTests {
         // Assert
         response.andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("Arthur.Dent"));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "arthur.dent@home, arthur.dent@example.com, username",
+            "arthur.dent, arthur.dent, email"
+    })
+    void refusesAnInvalidField(String username, String email, String invalidField) throws Exception {
+        // Act: one case per field, since AccountRulesTests checks the rules
+        ResultActions response = updateProfile(username, email);
+
+        // Assert
+        response.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors." + invalidField).isString());
+        assertThat(userRepository.findById(user.getId()).orElseThrow().getUsername()).isEqualTo("arthur.dent");
     }
 
     @Test
