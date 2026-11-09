@@ -60,6 +60,9 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "Profile updated",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                     schema = @Schema(implementation = UserResponse.class)))
+    @ApiResponse(responseCode = "409", description = "Username or e-mail already taken by another user",
+            content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE,
+                    schema = @Schema(implementation = ProblemDetail.class)))
     public UserResponse updateMe(@AuthenticationPrincipal Jwt jwt, @RequestBody ProfileRequest request) {
         return UserResponse.from(userService.updateProfile(userId(jwt), request));
     }

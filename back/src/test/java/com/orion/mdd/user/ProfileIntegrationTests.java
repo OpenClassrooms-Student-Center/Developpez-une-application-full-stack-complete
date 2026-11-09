@@ -86,6 +86,57 @@ class ProfileIntegrationTests {
     }
 
     @Test
+    void refusesAUsernameTakenByAnotherUserWhateverItsCase() throws Exception {
+        // Arrange
+        userRepository.save(new User("ford.prefect", "ford.prefect@example.com", "hash"));
+
+        // Act
+        ResultActions response = updateProfile("Ford.Prefect", "arthur.dent@example.com", null);
+
+        // Assert
+        response.andExpect(status().isConflict())
+                .andExpect(jsonPath("$.errors.username").value("Ce nom d’utilisateur est déjà pris."));
+    }
+
+    @Test
+    void refusesAnEmailTakenByAnotherUserWhateverItsCase() throws Exception {
+        // Arrange
+        userRepository.save(new User("ford.prefect", "ford.prefect@example.com", "hash"));
+
+        // Act
+        ResultActions response = updateProfile("arthur.dent", "FORD.PREFECT@example.com", null);
+
+        // Assert
+        response.andExpect(status().isConflict())
+                .andExpect(jsonPath("$.errors.email").value("Cette adresse e-mail est déjà utilisée."));
+    }
+
+    @Test
+    void refusesATokenWhoseAccountNoLongerExistsEvenWithATakenUsername() throws Exception {
+        // Arrange: the account is deleted, and its token asks for the username of another user
+        userRepository.save(new User("ford.prefect", "ford.prefect@example.com", "hash"));
+        userRepository.delete(user);
+        userRepository.flush();
+
+        // Act
+        ResultActions response = updateProfile("ford.prefect", "arthur.dent@example.com", null);
+
+        // Assert: the account is checked before the values it asks for
+        response.andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.detail").value("Vous devez être connecté."));
+    }
+
+    @Test
+    void acceptsTheUsersOwnValuesEvenInAnotherCase() throws Exception {
+        // Act: the user's own username and e-mail address are not taken by someone else
+        ResultActions response = updateProfile("Arthur.Dent", "ARTHUR.DENT@example.com", null);
+
+        // Assert
+        response.andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("Arthur.Dent"));
+    }
+
+    @Test
     void refusesAChangeWithoutACsrfToken() throws Exception {
         // Act: another site cannot change the profile
         ResultActions response = mockMvc.perform(put("/api/users/me")
