@@ -55,7 +55,7 @@ class AccountRulesTests {
                 Arguments.of("username", "marvin.déprimé", Set.of("Pattern")),
                 Arguments.of("email", "   ", Set.of("NotBlank", "Email")),
                 Arguments.of("email", "arthur.dent", Set.of("Email")),
-                Arguments.of("email", "dent@" + "vogon.".repeat(40) + "example.com", Set.of("Size")),
+                Arguments.of("email", "dent@" + "vogon.".repeat(39) + "example.co.uk.fr", Set.of("Size")),
                 Arguments.of("password", "   ", Set.of("NotBlank", "Pattern")),
                 Arguments.of("password", "Deep-42", Set.of("Pattern")),
                 Arguments.of("password", "Dont-Panic-42".repeat(5), Set.of("Pattern")),
@@ -80,7 +80,7 @@ class AccountRulesTests {
                 Arguments.of("username", "ade"),
                 Arguments.of("username", "zaphod.beeblebrox_president-42"),
                 Arguments.of("email", "arthur.dent@example.com"),
-                Arguments.of("email", "dent@" + "vogon.".repeat(39) + "example.co.uk.fr"),
+                Arguments.of("email", "dent@" + "vogon.".repeat(39) + "examples.com.fr"),
                 Arguments.of("password", "Deep-42!"),
                 Arguments.of("password", "Aa1-" + "x".repeat(60)));
     }

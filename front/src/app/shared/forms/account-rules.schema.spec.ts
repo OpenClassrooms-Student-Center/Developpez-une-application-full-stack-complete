@@ -35,6 +35,8 @@ describe('Account rules', () => {
   it.each([
     ['', ['required']],
     ['arthur.dent', ['email']],
+    // Angular's email rule already stops at 254 characters, the limit of RFC 5321
+    [`dent@${'vogon.'.repeat(39)}example.co.uk.fr`, ['email', 'maxLength']],
   ])('refuses the e-mail address "%s"', (value, rules) => {
     expect(brokenRules(emailRules, value)).toEqual(rules);
   });
