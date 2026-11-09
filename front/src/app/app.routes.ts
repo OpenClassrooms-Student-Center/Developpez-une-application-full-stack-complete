@@ -34,6 +34,11 @@ export const routes: Routes = [
         title: 'Fil d’actualité – MDD',
         loadComponent: () => import('./features/feed/feed.component').then((m) => m.Feed),
       },
+      {
+        path: 'profile',
+        title: 'Profil – MDD',
+        loadComponent: () => import('./features/profile/profile.component').then((m) => m.Profile),
+      },
     ],
   },
 ];

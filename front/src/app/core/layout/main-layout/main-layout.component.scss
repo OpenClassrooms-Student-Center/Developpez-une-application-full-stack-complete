@@ -27,3 +27,51 @@
     )
   );
 }
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+// The profile icon of the mockup: 48 pixels, the size of the button itself
+.profile {
+  // Hover and press tint the disk in violet, like the buttons of the home page
+  @include mat.icon-button-overrides(
+    (
+      icon-size: 48px,
+      state-layer-size: 48px,
+      state-layer-color: var(--mat-sys-primary),
+      ripple-color: color-mix(in srgb, var(--mat-sys-primary) 12%, transparent),
+    )
+  );
+
+  svg {
+    display: block;
+  }
+
+  // Its border has the colour of the disk, and turns violet on hover, on keyboard focus and on the
+  // profile page
+  .disk {
+    fill: #d9d9d9;
+    stroke: #d9d9d9;
+    stroke-width: 3;
+  }
+
+  .person {
+    fill: none;
+    stroke: rgb(0 0 0 / 50%);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &:hover,
+  &:focus-visible,
+  &.active {
+    .disk,
+    .person {
+      stroke: var(--mat-sys-primary);
+    }
+  }
+}

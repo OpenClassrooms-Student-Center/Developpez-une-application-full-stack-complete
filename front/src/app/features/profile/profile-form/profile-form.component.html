@@ -1,0 +1,20 @@
+<form class="form" [formRoot]="profileForm">
+  <label for="username">Nom d’utilisateur</label>
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <input matInput id="username" autocomplete="username" [formField]="profileForm.username" />
+    <mat-error>{{ profileForm.username().errors()[0]?.message }}</mat-error>
+  </mat-form-field>
+
+  <label for="email">Adresse e-mail</label>
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <input matInput id="email" type="email" autocomplete="email" [formField]="profileForm.email" />
+    <mat-error>{{ profileForm.email().errors()[0]?.message }}</mat-error>
+  </mat-form-field>
+
+  @if (failure()) {
+    <p class="failure" role="alert">{{ failure() }}</p>
+  }
+  <button matButton="filled" type="submit" [disabled]="profileForm().submitting()">
+    Sauvegarder
+  </button>
+</form>

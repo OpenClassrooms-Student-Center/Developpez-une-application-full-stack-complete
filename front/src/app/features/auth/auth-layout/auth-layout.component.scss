@@ -1,5 +1,3 @@
-@use '@angular/material' as mat;
-
 :host {
   display: flex;
   flex-direction: column;
@@ -70,20 +68,6 @@
   @media (min-width: 600px) {
     margin: auto;
   }
-
-  @include mat.form-field-overrides(
-    (
-      container-height: 40px,
-      container-vertical-padding: 8px,
-      outlined-container-shape: 8px,
-      outlined-outline-color: var(--mat-sys-on-surface),
-    )
-  );
-  @include mat.button-overrides(
-    (
-      filled-container-shape: 8px,
-    )
-  );
 }
 
 h1 {
