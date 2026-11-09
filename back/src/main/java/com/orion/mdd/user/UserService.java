@@ -8,7 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
- * Gives access to the logged-in user and lets them change their profile and their password.
+ * Gives access to the logged-in user and lets them change their profile and their password, or delete their account.
  */
 @Service
 public class UserService {
@@ -88,6 +88,16 @@ public class UserService {
 
         user.changePassword(passwordEncoder.encode(request.newPassword()));
         userRepository.save(user);
+    }
+
+    /**
+     * Deletes the account. The database deletes its subscriptions, comments and posts in cascade.
+     *
+     * @param id
+     *            the identifier carried by the token
+     */
+    public void deleteAccount(Long id) {
+        userRepository.deleteById(id);
     }
 
 }
