@@ -3,8 +3,10 @@ package com.orion.mdd.user;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,7 +55,7 @@ public class UserController {
      * @param jwt
      *            the verified token
      * @param request
-     *            the new values, with a {@code null} password to keep the current one
+     *            the new username and e-mail address
      * @return the updated profile
      */
     @PutMapping("/me")
@@ -65,6 +67,29 @@ public class UserController {
                     schema = @Schema(implementation = ProblemDetail.class)))
     public UserResponse updateMe(@AuthenticationPrincipal Jwt jwt, @RequestBody ProfileRequest request) {
         return UserResponse.from(userService.updateProfile(userId(jwt), request));
+    }
+
+    /**
+     * Changes the password of the logged-in user, who must give the current one.
+     *
+     * @param jwt
+     *            the verified token
+     * @param request
+     *            the current password and the new one
+     * @return an empty response
+     */
+    @PutMapping("/me/password")
+    @ApiResponse(responseCode = "204", description = "Password changed")
+    @ApiResponse(responseCode = "400", description = "Invalid data or wrong current password, one message per field",
+            content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE,
+                    schema = @Schema(implementation = ProblemDetail.class)))
+    @ApiResponse(responseCode = "401", description = "Not logged in, or the account no longer exists",
+            content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE,
+                    schema = @Schema(implementation = ProblemDetail.class)))
+    public ResponseEntity<Void> changeMyPassword(@AuthenticationPrincipal Jwt jwt,
+            @Valid @RequestBody PasswordChangeRequest request) {
+        userService.changePassword(userId(jwt), request);
+        return ResponseEntity.noContent().build();
     }
 
     private static Long userId(Jwt jwt) {

@@ -47,9 +47,9 @@ class ProfileIntegrationTests {
     }
 
     @Test
-    void changesTheUsernameAndTheEmailAndKeepsThePasswordWhenNoneIsGiven() throws Exception {
+    void changesTheUsernameAndTheEmail() throws Exception {
         // Act
-        ResultActions response = updateProfile("ford.prefect", "ford.prefect@example.com", null);
+        ResultActions response = updateProfile("ford.prefect", "ford.prefect@example.com");
 
         // Assert
         response.andExpect(status().isOk())
@@ -60,24 +60,29 @@ class ProfileIntegrationTests {
         User saved = userRepository.findById(user.getId()).orElseThrow();
         assertThat(saved.getUsername()).isEqualTo("ford.prefect");
         assertThat(saved.getEmail()).isEqualTo("ford.prefect@example.com");
-        assertThat(passwordEncoder.matches(PASSWORD, saved.getPassword())).isTrue();
     }
 
     @Test
-    void storesTheHashOfANewPassword() throws Exception {
-        // Act
-        updateProfile("arthur.dent", "arthur.dent@example.com", "So-Long-42").andExpect(status().isOk());
+    void neverChangesThePassword() throws Exception {
+        // Act: the password has its own form, which asks for the current one
+        mockMvc.perform(put("/api/users/me")
+                .cookie(token)
+                .with(Csrf.from(mockMvc))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"username": "arthur.dent", "email": "arthur.dent@example.com", "password": "So-Long-42"}
+                        """))
+                .andExpect(status().isOk());
 
         // Assert
         String hash = userRepository.findById(user.getId()).orElseThrow().getPassword();
-        assertThat(hash).startsWith("{argon2}");
-        assertThat(passwordEncoder.matches("So-Long-42", hash)).isTrue();
+        assertThat(passwordEncoder.matches(PASSWORD, hash)).isTrue();
     }
 
     @Test
     void keepsTheUserLoggedInAfterAChange() throws Exception {
         // Act: the token names the account by its id, which never changes
-        updateProfile("ford.prefect", "ford.prefect@example.com", null);
+        updateProfile("ford.prefect", "ford.prefect@example.com");
 
         // Assert
         mockMvc.perform(get("/api/users/me").cookie(token))
@@ -91,7 +96,7 @@ class ProfileIntegrationTests {
         userRepository.save(new User("ford.prefect", "ford.prefect@example.com", "hash"));
 
         // Act
-        ResultActions response = updateProfile("Ford.Prefect", "arthur.dent@example.com", null);
+        ResultActions response = updateProfile("Ford.Prefect", "arthur.dent@example.com");
 
         // Assert
         response.andExpect(status().isConflict())
@@ -104,7 +109,7 @@ class ProfileIntegrationTests {
         userRepository.save(new User("ford.prefect", "ford.prefect@example.com", "hash"));
 
         // Act
-        ResultActions response = updateProfile("arthur.dent", "FORD.PREFECT@example.com", null);
+        ResultActions response = updateProfile("arthur.dent", "FORD.PREFECT@example.com");
 
         // Assert
         response.andExpect(status().isConflict())
@@ -119,7 +124,7 @@ class ProfileIntegrationTests {
         userRepository.flush();
 
         // Act
-        ResultActions response = updateProfile("ford.prefect", "arthur.dent@example.com", null);
+        ResultActions response = updateProfile("ford.prefect", "arthur.dent@example.com");
 
         // Assert: the account is checked before the values it asks for
         response.andExpect(status().isUnauthorized())
@@ -129,7 +134,7 @@ class ProfileIntegrationTests {
     @Test
     void acceptsTheUsersOwnValuesEvenInAnotherCase() throws Exception {
         // Act: the user's own username and e-mail address are not taken by someone else
-        ResultActions response = updateProfile("Arthur.Dent", "ARTHUR.DENT@example.com", null);
+        ResultActions response = updateProfile("Arthur.Dent", "ARTHUR.DENT@example.com");
 
         // Assert
         response.andExpect(status().isOk())
@@ -142,26 +147,25 @@ class ProfileIntegrationTests {
         ResultActions response = mockMvc.perform(put("/api/users/me")
                 .cookie(token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(body("ford.prefect", "ford.prefect@example.com", null)));
+                .content(body("ford.prefect", "ford.prefect@example.com")));
 
         // Assert
         response.andExpect(status().isForbidden());
         assertThat(userRepository.findById(user.getId()).orElseThrow().getUsername()).isEqualTo("arthur.dent");
     }
 
-    private ResultActions updateProfile(String username, String email, String password) throws Exception {
+    private ResultActions updateProfile(String username, String email) throws Exception {
         return mockMvc.perform(put("/api/users/me")
                 .cookie(token)
                 .with(Csrf.from(mockMvc))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(body(username, email, password)));
+                .content(body(username, email)));
     }
 
-    private static String body(String username, String email, String password) {
-        String passwordJson = password == null ? "null" : "\"" + password + "\"";
+    private static String body(String username, String email) {
         return """
-                {"username": "%s", "email": "%s", "password": %s}
-                """.formatted(username, email, passwordJson);
+                {"username": "%s", "email": "%s"}
+                """.formatted(username, email);
     }
 
 }

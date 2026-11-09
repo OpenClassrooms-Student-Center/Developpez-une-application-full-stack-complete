@@ -24,7 +24,7 @@ class UserServiceTests {
         User user = new User("arthur.dent", "arthur.dent@example.com", "hash");
         when(userRepository.findById(42L)).thenReturn(Optional.of(user));
         when(userRepository.saveAndFlush(any())).thenThrow(new DataIntegrityViolationException("Duplicate entry"));
-        ProfileRequest request = new ProfileRequest("ford.prefect", "ford.prefect@example.com", null);
+        ProfileRequest request = new ProfileRequest("ford.prefect", "ford.prefect@example.com");
 
         // Act and assert
         assertThatThrownBy(() -> userService.updateProfile(42L, request))

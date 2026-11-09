@@ -1,13 +1,14 @@
 package com.orion.mdd.user;
 
 import com.orion.mdd.common.exception.ConflictException;
+import com.orion.mdd.common.exception.InvalidFieldException;
 import com.orion.mdd.common.exception.UserNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
- * Gives access to the logged-in user and lets them change their profile.
+ * Gives access to the logged-in user and lets them change their profile and their password.
  */
 @Service
 public class UserService {
@@ -34,7 +35,7 @@ public class UserService {
     }
 
     /**
-     * Changes the username and the e-mail address, and the password only when a new one is given.
+     * Changes the username and the e-mail address. The password has its own method, which asks for the current one.
      *
      * @param id
      *            the identifier carried by the token
@@ -58,16 +59,35 @@ public class UserService {
         }
 
         user.changeProfile(request.username(), request.email());
-        String password = request.password();
-        if (password != null) {
-            user.changePassword(passwordEncoder.encode(password));
-        }
         try {
             // Flushing here makes the unique constraints answer now, inside this try, not at the commit
             return userRepository.saveAndFlush(user);
         } catch (DataIntegrityViolationException exception) {
             throw new ConflictException("Ce nom d’utilisateur ou cette adresse e-mail est déjà pris.");
         }
+    }
+
+    /**
+     * Replaces the password once the current one has been confirmed.
+     *
+     * @param id
+     *            the identifier carried by the token
+     * @param request
+     *            the current password and the new one
+     * @throws UserNotFoundException
+     *             if the account no longer exists
+     * @throws InvalidFieldException
+     *             if the current password is wrong
+     */
+    public void changePassword(Long id, PasswordChangeRequest request) {
+        User user = getCurrentUser(id);
+
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
+            throw new InvalidFieldException("currentPassword", "Le mot de passe actuel est incorrect.");
+        }
+
+        user.changePassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
     }
 
 }
