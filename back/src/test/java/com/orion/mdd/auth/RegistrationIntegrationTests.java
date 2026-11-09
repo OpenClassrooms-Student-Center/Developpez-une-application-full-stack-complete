@@ -122,25 +122,13 @@ class RegistrationIntegrationTests {
         assertThat(userRepository.count()).isZero();
     }
 
+    /** One case per field: the rules themselves are checked by AccountRulesTests. */
     private static Stream<Arguments> invalidFields() {
-        String valid = "arthur.dent";
         String email = "arthur.dent@example.com";
         return Stream.of(
-                Arguments.of("   ", email, PASSWORD, "username"),
-                Arguments.of("42", email, PASSWORD, "username"),
-                Arguments.of("zaphod.beeblebrox.the.president", email, PASSWORD, "username"),
                 Arguments.of("arthur.dent@home", email, PASSWORD, "username"),
-                Arguments.of("marvin.déprimé", email, PASSWORD, "username"),
-                Arguments.of(valid, "   ", PASSWORD, "email"),
-                Arguments.of(valid, "arthur.dent", PASSWORD, "email"),
-                Arguments.of(valid, "dent@" + "vogon.".repeat(40) + "example.com", PASSWORD, "email"),
-                Arguments.of(valid, email, "   ", "password"),
-                Arguments.of(valid, email, "Deep-42", "password"),
-                Arguments.of(valid, email, "Dont-Panic-42".repeat(5), "password"),
-                Arguments.of(valid, email, "dont-panic-42", "password"),
-                Arguments.of(valid, email, "DONT-PANIC-42", "password"),
-                Arguments.of(valid, email, "Dont-Panic", "password"),
-                Arguments.of(valid, email, "DontPanic42", "password"));
+                Arguments.of("arthur.dent", "arthur.dent", PASSWORD, "email"),
+                Arguments.of("arthur.dent", email, "Deep-42", "password"));
     }
 
     @Test
