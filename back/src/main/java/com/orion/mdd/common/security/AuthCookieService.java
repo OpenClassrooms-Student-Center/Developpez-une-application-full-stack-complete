@@ -1,8 +1,5 @@
-package com.orion.mdd.auth;
+package com.orion.mdd.common.security;
 
-import com.orion.mdd.common.security.JwtProperties;
-import com.orion.mdd.common.security.SecurityConfig;
-import com.orion.mdd.user.User;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
@@ -31,14 +28,14 @@ public class AuthCookieService {
     /**
      * Signs a token for the user and wraps it in a cookie that scripts cannot read.
      *
-     * @param user
-     *            the user, already saved in the database
+     * @param userId
+     *            the identifier of the user, already saved in the database
      * @return the cookie, which lasts as long as the token
      */
-    public ResponseCookie create(User user) {
+    public ResponseCookie create(Long userId) {
         Instant now = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
-                .subject(String.valueOf(user.getId()))
+                .subject(String.valueOf(userId))
                 .issuedAt(now)
                 .expiresAt(now.plus(jwtProperties.expiration()))
                 .build();

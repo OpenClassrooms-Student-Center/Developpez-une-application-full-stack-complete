@@ -2,6 +2,7 @@ package com.orion.mdd.auth;
 
 import com.orion.mdd.Csrf;
 import com.orion.mdd.IntegrationTest;
+import com.orion.mdd.common.security.AuthCookieService;
 import com.orion.mdd.user.User;
 import com.orion.mdd.user.UserRepository;
 import jakarta.servlet.http.Cookie;
@@ -169,7 +170,7 @@ class LoginAndLogoutIntegrationTests {
     }
 
     private Cookie invalidTokenCookie() {
-        String token = authCookieService.create(user).getValue();
+        String token = authCookieService.create(user.getId()).getValue();
         return new Cookie("mdd_token", token.substring(0, token.lastIndexOf('.') + 1) + "A".repeat(43));
     }
 

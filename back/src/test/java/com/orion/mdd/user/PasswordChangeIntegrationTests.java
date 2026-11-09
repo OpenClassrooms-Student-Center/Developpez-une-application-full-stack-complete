@@ -2,7 +2,7 @@ package com.orion.mdd.user;
 
 import com.orion.mdd.Csrf;
 import com.orion.mdd.IntegrationTest;
-import com.orion.mdd.auth.AuthCookieService;
+import com.orion.mdd.common.security.AuthCookieService;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +45,7 @@ class PasswordChangeIntegrationTests {
     void logIn() {
         user = userRepository
                 .save(new User("arthur.dent", "arthur.dent@example.com", passwordEncoder.encode(PASSWORD)));
-        token = new Cookie("mdd_token", authCookieService.create(user).getValue());
+        token = new Cookie("mdd_token", authCookieService.create(user.getId()).getValue());
     }
 
     @Test
