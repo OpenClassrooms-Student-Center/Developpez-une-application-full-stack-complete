@@ -103,6 +103,7 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
+            "coverageExclude": ["src/testing/**"],
             "coverageThresholds": {
               "lines": 80,
               "branches": 80
