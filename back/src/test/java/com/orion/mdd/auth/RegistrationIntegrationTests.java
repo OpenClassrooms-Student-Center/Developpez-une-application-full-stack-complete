@@ -1,5 +1,6 @@
 package com.orion.mdd.auth;
 
+import com.orion.mdd.Csrf;
 import com.orion.mdd.IntegrationTest;
 import com.orion.mdd.user.User;
 import com.orion.mdd.user.UserRepository;
@@ -173,11 +174,8 @@ class RegistrationIntegrationTests {
 
     /** Sends what a browser sends: a first call gives the CSRF cookie, then the POST repeats it in a header. */
     private ResultActions register(String username, String email, String password) throws Exception {
-        Cookie csrfCookie = Objects.requireNonNull(
-                mockMvc.perform(get("/api/users/me")).andReturn().getResponse().getCookie("XSRF-TOKEN"));
         return mockMvc.perform(post("/api/auth/register")
-                .cookie(csrfCookie)
-                .header("X-XSRF-TOKEN", csrfCookie.getValue())
+                .with(Csrf.from(mockMvc))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body(username, email, password)));
     }

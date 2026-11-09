@@ -1,5 +1,6 @@
 package com.orion.mdd.auth;
 
+import com.orion.mdd.Csrf;
 import com.orion.mdd.IntegrationTest;
 import com.orion.mdd.user.User;
 import com.orion.mdd.user.UserRepository;
@@ -16,9 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import java.util.Objects;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -151,26 +152,20 @@ class LoginAndLogoutIntegrationTests {
 
     /** Sends what a browser sends: a first call gives the CSRF cookie, then the POST repeats it in a header. */
     private ResultActions logIn(String email, String password, Cookie... otherCookies) throws Exception {
-        Cookie csrfCookie = csrfCookie();
-        return mockMvc.perform(post("/api/auth/login")
-                .cookie(Stream.concat(Stream.of(csrfCookie), Stream.of(otherCookies)).toArray(Cookie[]::new))
-                .header("X-XSRF-TOKEN", csrfCookie.getValue())
+        MockHttpServletRequestBuilder request = post("/api/auth/login")
+                .with(Csrf.from(mockMvc))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {"email": "%s", "password": "%s"}
-                        """.formatted(email, password)));
+                        """.formatted(email, password));
+        if (otherCookies.length > 0) {
+            request.cookie(otherCookies);
+        }
+        return mockMvc.perform(request);
     }
 
     private ResultActions logOut(Cookie token) throws Exception {
-        Cookie csrfCookie = csrfCookie();
-        return mockMvc.perform(post("/api/auth/logout")
-                .cookie(csrfCookie, token)
-                .header("X-XSRF-TOKEN", csrfCookie.getValue()));
-    }
-
-    private Cookie csrfCookie() throws Exception {
-        return Objects.requireNonNull(
-                mockMvc.perform(get("/api/users/me")).andReturn().getResponse().getCookie("XSRF-TOKEN"));
+        return mockMvc.perform(post("/api/auth/logout").cookie(token).with(Csrf.from(mockMvc)));
     }
 
     private Cookie invalidTokenCookie() {
