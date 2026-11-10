@@ -8,7 +8,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { Session } from '../../../core/session/session.service';
 import { emailRules, usernameRules } from '../../../shared/forms/account-rules.schema';
-import { failureMessage, fieldErrors } from '../../../shared/forms/server-errors.util';
+import { submissionErrors } from '../../../shared/forms/server-errors.util';
 import { ProfileApi } from '../profile-api.service';
 import { ProfileRequest } from '../profile-request.model';
 
@@ -48,9 +48,7 @@ export class ProfileForm {
             this.snackBar.open('Profil mis à jour.', undefined, { duration: 3000 });
             return undefined;
           } catch (error) {
-            const errors = fieldErrors(error, field);
-            this.failure.set(errors.length > 0 ? '' : failureMessage(error));
-            return errors;
+            return submissionErrors(error, field, this.failure);
           }
         },
       },

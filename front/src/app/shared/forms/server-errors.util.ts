@@ -1,4 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { WritableSignal } from '@angular/core';
 import { FieldTree, ValidationError } from '@angular/forms/signals';
 
 interface Problem {
@@ -31,4 +32,18 @@ export function fieldErrors<T>(
  */
 export function failureMessage(error: unknown): string {
   return problemOf(error)?.detail ?? 'Une erreur est survenue. Veuillez réessayer.';
+}
+
+/**
+ * Turns a failed submission into what Signal Forms expects: the API's messages under their fields, or,
+ * when the API names no field, a general message in `failure`.
+ */
+export function submissionErrors<T>(
+  error: unknown,
+  form: FieldTree<T>,
+  failure: WritableSignal<string>,
+): ValidationError.WithOptionalFieldTree[] {
+  const errors = fieldErrors(error, form);
+  failure.set(errors.length > 0 ? '' : failureMessage(error));
+  return errors;
 }

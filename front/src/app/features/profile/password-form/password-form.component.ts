@@ -7,7 +7,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { firstValueFrom } from 'rxjs';
 
 import { passwordRules, requiredPasswordRules } from '../../../shared/forms/account-rules.schema';
-import { failureMessage, fieldErrors } from '../../../shared/forms/server-errors.util';
+import { submissionErrors } from '../../../shared/forms/server-errors.util';
 import { PasswordChangeRequest } from '../password-change-request.model';
 import { ProfileApi } from '../profile-api.service';
 
@@ -46,9 +46,7 @@ export class PasswordForm {
 
             return undefined;
           } catch (error) {
-            const errors = fieldErrors(error, field);
-            this.failure.set(errors.length > 0 ? '' : failureMessage(error));
-            return errors;
+            return submissionErrors(error, field, this.failure);
           }
         },
       },
