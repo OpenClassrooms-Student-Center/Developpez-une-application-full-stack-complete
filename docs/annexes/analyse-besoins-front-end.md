@@ -59,8 +59,8 @@ Cette annexe a pour but de relier chaque écran des maquettes aux fonctionnalit�
 
 - **Accès** : utilisateur connecté.
 - **Fonctionnalités** : Profil, Abonnement (désabonnement).
-- **Contenu** : bandeau, titre « Profil utilisateur », formulaire prérempli avec le nom d’utilisateur et l’e-mail, champ « Mot de passe » et bouton « Sauvegarder ». Puis la section « Abonnements » : les thèmes suivis, chacun avec son titre, sa description et un bouton « Se désabonner ». Enfin, un bouton « Supprimer mon compte ».
-- **Règles** : l’e-mail, le nom d’utilisateur et le mot de passe sont modifiables, avec les règles de l’inscription ; laissé vide, le mot de passe reste inchangé ; on s’y désabonne d’un thème ; la suppression du compte demande une confirmation.
+- **Contenu** : bandeau, titre « Profil utilisateur », formulaire prérempli avec le nom d’utilisateur, l’e-mail et le bouton « Sauvegarder », puis le formulaire « Mot de passe » (« Mot de passe actuel », « Nouveau mot de passe », bouton « Modifier »). Puis la section « Abonnements » : les thèmes suivis, chacun avec son titre, sa description et un bouton « Se désabonner ». Enfin, un bouton « Supprimer mon compte ».
+- **Règles** : l’e-mail, le nom d’utilisateur et le mot de passe sont modifiables, avec les règles de l’inscription ; changer de mot de passe demande l’actuel ; un message confirme chaque enregistrement ; on s’y désabonne d’un thème ; la suppression du compte demande une confirmation.
 
 ### Pages légales
 
@@ -87,3 +87,5 @@ Un bandeau dont le visuel change comme suit :
 - **Date des commentaires** : demandée par les spécifications, mais absente de la maquette ; elle est enregistrée sans être affichée.
 - **Connexion par e-mail** : les spécifications et la maquette prévoient l’e-mail ou le nom d’utilisateur. Or le nom d’utilisateur, qui signe chaque article et chaque commentaire, est connu de tous : s’en servir pour se connecter donnerait à chacun la moitié des identifiants des autres. La connexion se fait donc avec l’e-mail, jamais montré aux autres utilisateurs.
 - **Pages légales et suppression du compte** : absentes des spécifications et des maquettes, elles répondent aux obligations légales : mentions légales, politique de confidentialité et droit à l’effacement des données personnelles (RGPD).
+- **Formulaire du mot de passe** : la maquette place le mot de passe dans le formulaire du profil ; il a son propre formulaire, qui demande le mot de passe actuel, pour qu’une session restée ouverte ne suffise pas à le changer.
+- **Messages de confirmation** : absents de la maquette, « Profil mis à jour. » et « Mot de passe modifié. » indiquent que l’enregistrement a réussi, puisque la page reste affichée.
