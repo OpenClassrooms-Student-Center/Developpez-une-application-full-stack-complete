@@ -13,11 +13,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * An e-mail address: valid and 255 characters at most. Each broken rule reports its own message.
+ * An e-mail address: valid and 254 characters at most, the limit of RFC 5321. Each broken rule reports its own
+ * message.
  */
 @NotBlank(message = "L’adresse e-mail est obligatoire.")
 @Email(message = "Cette adresse e-mail n’est pas valide.")
-@Size(max = 255, message = "L’adresse e-mail compte 255 caractères au plus.")
+@Size(max = 254, message = "L’adresse e-mail compte 254 caractères au plus.")
 @Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)

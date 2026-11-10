@@ -12,7 +12,7 @@ import {
   passwordRules,
   usernameRules,
 } from '../../../shared/forms/account-rules.schema';
-import { failureMessage, fieldErrors } from '../../../shared/forms/server-errors.util';
+import { submissionErrors } from '../../../shared/forms/server-errors.util';
 import { AuthApi } from '../auth-api.service';
 import { AuthLayout } from '../auth-layout/auth-layout.component';
 import { RegisterRequest } from '../register-request.model';
@@ -47,9 +47,7 @@ export class Register {
             await this.router.navigateByUrl('/feed');
             return undefined;
           } catch (error) {
-            const errors = fieldErrors(error, field);
-            this.failure.set(errors.length > 0 ? '' : failureMessage(error));
-            return errors;
+            return submissionErrors(error, field, this.failure);
           }
         },
       },

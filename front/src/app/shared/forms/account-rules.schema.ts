@@ -14,12 +14,12 @@ export const usernameRules = schema<string>((path) => {
 });
 
 /**
- * A valid e-mail address of 255 characters at most, as the API requires.
+ * A valid e-mail address of 254 characters at most, the limit of RFC 5321, as the API requires.
  */
 export const emailRules = schema<string>((path) => {
   required(path, { message: 'L’adresse e-mail est obligatoire.' });
   email(path, { message: 'Cette adresse e-mail n’est pas valide.' });
-  maxLength(path, 255, { message: 'L’adresse e-mail compte 255 caractères au plus.' });
+  maxLength(path, 254, { message: 'L’adresse e-mail compte 254 caractères au plus.' });
 });
 
 /**

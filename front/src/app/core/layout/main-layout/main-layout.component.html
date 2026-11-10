@@ -2,6 +2,22 @@
   <a routerLink="/feed"><img src="logo.png" alt="MDD" width="695" height="401" /></a>
   <nav aria-label="Navigation principale">
     <button class="logout" matButton type="button" (click)="logOut()">Se déconnecter</button>
+    <a
+      class="profile"
+      matIconButton
+      routerLink="/profile"
+      routerLinkActive="active"
+      ariaCurrentWhenActive="page"
+      aria-label="Profil"
+    >
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <circle class="disk" cx="24" cy="24" r="22.5" />
+        <g class="person">
+          <path d="M12 38v-3.12a6.24 6.24 0 0 1 6.24-6.24h12.47a6.24 6.24 0 0 1 6.24 6.24V38" />
+          <circle cx="24.47" cy="16.24" r="6.24" />
+        </g>
+      </svg>
+    </a>
   </nav>
 </header>
 <main>

@@ -1,0 +1,16 @@
+<button class="delete" matButton type="button" (click)="deleteAccount()">
+  Supprimer mon compte
+</button>
+
+<ng-template #confirmation>
+  <h2 mat-dialog-title>Supprimer votre compte ?</h2>
+  <mat-dialog-content>
+    Vos abonnements, vos articles et vos commentaires seront supprimés. Cette action est définitive.
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button matButton type="button" [mat-dialog-close]="false">Annuler</button>
+    <button class="confirm" matButton="filled" type="button" [mat-dialog-close]="true">
+      Supprimer
+    </button>
+  </mat-dialog-actions>
+</ng-template>

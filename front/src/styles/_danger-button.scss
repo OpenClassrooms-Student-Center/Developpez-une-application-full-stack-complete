@@ -1,0 +1,25 @@
+@use 'sass:color';
+@use '@angular/material' as mat;
+
+// The red of « Se déconnecter » in the mockup, for the actions that close the session or destroy data
+$color: #a40f0f;
+
+// A text button in that red, like « Se déconnecter » in the header
+@mixin text {
+  @include mat.button-overrides(
+    (
+      text-label-text-color: $color,
+      text-state-layer-color: $color,
+      text-ripple-color: color.change($color, $alpha: 0.12),
+    )
+  );
+}
+
+// A filled button in that red, to confirm a deletion
+@mixin filled {
+  @include mat.button-overrides(
+    (
+      filled-container-color: $color,
+    )
+  );
+}

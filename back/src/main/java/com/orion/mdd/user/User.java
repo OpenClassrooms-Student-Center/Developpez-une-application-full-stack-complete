@@ -34,4 +34,27 @@ public class User {
         this.password = password;
     }
 
+    /**
+     * Changes the public name and the e-mail address. The identifier stays, so the user's token stays valid.
+     *
+     * @param username
+     *            the new public name
+     * @param email
+     *            the new e-mail address
+     */
+    public void changeProfile(String username, String email) {
+        this.username = username;
+        this.email = email;
+    }
+
+    /**
+     * Replaces the password.
+     *
+     * @param passwordHash
+     *            the hash of the new password
+     */
+    public void changePassword(String passwordHash) {
+        this.password = passwordHash;
+    }
+
 }

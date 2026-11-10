@@ -20,12 +20,24 @@ export class Session {
   }
 
   /**
+   * Keeps the profile the API has just saved.
+   */
+  update(user: User): void {
+    this.currentUser.set(user);
+  }
+
+  /**
    * Asks the API to delete the cookie, then forgets the user.
    */
   logOut(): Observable<void> {
-    return this.http
-      .post<void>('/api/auth/logout', null)
-      .pipe(map(() => this.currentUser.set(null)));
+    return this.http.post<void>('/api/auth/logout', null).pipe(map(() => this.forget()));
+  }
+
+  /**
+   * Forgets the user once the API has deleted the cookie, after a logout or an account deletion.
+   */
+  forget(): void {
+    this.currentUser.set(null);
   }
 
   /**

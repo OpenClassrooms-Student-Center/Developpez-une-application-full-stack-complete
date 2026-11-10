@@ -1,5 +1,6 @@
 package com.orion.mdd.auth;
 
+import com.orion.mdd.common.security.AuthCookieService;
 import com.orion.mdd.user.User;
 import com.orion.mdd.user.UserResponse;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -51,7 +52,7 @@ public class AuthController {
     public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
         User user = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .header(HttpHeaders.SET_COOKIE, authCookieService.create(user).toString())
+                .header(HttpHeaders.SET_COOKIE, authCookieService.create(user.getId()).toString())
                 .body(UserResponse.from(user));
     }
 
@@ -75,7 +76,7 @@ public class AuthController {
     public ResponseEntity<UserResponse> login(@Valid @RequestBody LoginRequest request) {
         User user = authService.login(request);
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, authCookieService.create(user).toString())
+                .header(HttpHeaders.SET_COOKIE, authCookieService.create(user.getId()).toString())
                 .body(UserResponse.from(user));
     }
 

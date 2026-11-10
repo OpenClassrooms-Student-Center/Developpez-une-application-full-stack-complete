@@ -49,6 +49,9 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": ["src/styles"]
+            },
             "assets": [
               {
                 "glob": "**/*",
@@ -103,6 +106,7 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
+            "coverageExclude": ["src/testing/**"],
             "coverageThresholds": {
               "lines": 80,
               "branches": 80

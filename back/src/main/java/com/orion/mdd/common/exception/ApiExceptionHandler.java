@@ -42,6 +42,20 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
+     * Answers 400 when a well-formed value is refused, with the same {@code errors} property as a validation error.
+     *
+     * @param exception
+     *            the refused field
+     * @return the Problem Details
+     */
+    @ExceptionHandler(InvalidFieldException.class)
+    public ProblemDetail handleInvalidField(InvalidFieldException exception) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
+        problem.setProperty("errors", exception.getErrors());
+        return problem;
+    }
+
+    /**
      * Answers 401 when the credentials are wrong, without saying which one.
      *
      * @return the Problem Details

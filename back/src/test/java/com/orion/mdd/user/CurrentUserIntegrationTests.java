@@ -1,7 +1,7 @@
 package com.orion.mdd.user;
 
 import com.orion.mdd.IntegrationTest;
-import com.orion.mdd.auth.AuthCookieService;
+import com.orion.mdd.common.security.AuthCookieService;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ class CurrentUserIntegrationTests {
     void refusesAForgedToken() throws Exception {
         // Arrange: a real token whose signature has been replaced
         User user = userRepository.save(new User("arthur.dent", "arthur.dent@example.com", "hash"));
-        String token = authCookieService.create(user).getValue();
+        String token = authCookieService.create(user.getId()).getValue();
         String forged = token.substring(0, token.lastIndexOf('.') + 1) + "A".repeat(43);
 
         // Act

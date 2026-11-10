@@ -2,7 +2,7 @@
 
 - **Auteur** : Lisa Bergeron
 - **Version** : 0.1.0
-- **Date** : 08/11/2026
+- **Date** : 10/11/2026
 
 ## 1. Présentation générale du projet
 
@@ -19,7 +19,7 @@ Avant de l’ouvrir à un large public, ORION souhaite le tester avec un MVP (Mi
 | Page d’accueil | Accéder aux formulaires d’inscription et de connexion | ✅ Terminé |
 | Inscription | S’inscrire avec un e-mail, un nom d’utilisateur et un mot de passe | ✅ Terminé |
 | Connexion | Se connecter avec son e-mail, se déconnecter | ✅ Terminé |
-| Profil | Consulter et modifier son profil, supprimer son compte | ⏳ À venir |
+| Profil | Consulter et modifier son profil, supprimer son compte | ✅ Terminé |
 | Thème | Consulter la liste de tous les thèmes | ⏳ À venir |
 | Abonnement | S’abonner à un thème et s’en désabonner | ⏳ À venir |
 | Fil d’actualité | Consulter et trier son fil d’actualité | ⏳ À venir |
@@ -194,7 +194,8 @@ L’API REST, servie sous `/api`, échange du JSON. L’inscription et la connex
 - **`POST /api/auth/login`** (`email`, `password`) : connecte l’utilisateur → 200, profil et cookie.
 - **`POST /api/auth/logout`** : déconnecte l’utilisateur → 204, cookie effacé.
 - **`GET /api/users/me`** : renvoie le profil de l’utilisateur connecté → 200.
-- **`PUT /api/users/me`** (`username`, `email`, `password` facultatif) : modifie le profil → 200, profil.
+- **`PUT /api/users/me`** (`username`, `email`) : modifie le profil → 200, profil.
+- **`PUT /api/users/me/password`** (`currentPassword`, `newPassword`) : change le mot de passe après vérification de l’actuel → 204.
 - **`DELETE /api/users/me`** : supprime le compte et ses données → 204, cookie effacé.
 - **`GET /api/topics`** : liste les thèmes, en indiquant ceux que suit l’utilisateur → 200.
 - **`PUT /api/topics/{id}/subscription`** : abonne l’utilisateur au thème → 204.
@@ -261,13 +262,13 @@ Content-Type: application/problem+json
 
 Les tests de chaque fonctionnalité sont écrits avant son code (TDD) et suivent le schéma Arrange-Act-Assert. Ils vérifient ce que l’utilisateur attend, à travers l’API ou l’interface, plutôt que le détail du code.
 
-- **Unitaires, back-end** : [JUnit](https://junit.org) et [Mockito](https://site.mockito.org). Portée : les règles des services, isolées de la base de données.
+- **Unitaires, back-end** : [JUnit](https://junit.org) et [Mockito](https://site.mockito.org). Portée : les règles des services et celles des champs, isolées de la base de données.
 - **Intégration, back-end** : Spring Boot Test et [Testcontainers](https://testcontainers.com). Portée : chaque endpoint, de la requête à un vrai MySQL 9.7 lancé dans un conteneur, migrations Flyway comprises. Ces tests vérifient aussi les règles portées par la base, comme l’unicité et la suppression en cascade. Une base en mémoire comme H2 serait plus rapide, mais ne se comporte pas exactement comme MySQL.
-- **Unitaires, front-end** : [Vitest](https://vitest.dev), proposé par défaut par Angular 22. Portée : un composant ou un service pris seul.
+- **Unitaires, front-end** : [Vitest](https://vitest.dev), proposé par défaut par Angular 22. Portée : un composant, un service ou les règles des formulaires, pris seuls.
 - **Intégration, front-end** : Vitest. Portée : une page dans la vraie application, avec ses routes, ses protections, ses intercepteurs et ses services ; seules les réponses de l’API sont simulées.
 - **De bout en bout** : [Cypress](https://docs.cypress.io). Portée : les parcours complets de l’utilisateur dans le navigateur, sur la vraie API et une base MySQL recréée à chaque lancement.
 
-La couverture est contrôlée à 80 % des lignes et des branches, avec [JaCoCo](https://www.jacoco.org/jacoco/) pour le back-end et Vitest pour le front-end : en dessous de ce seuil, `./mvnw verify` et `npm run test:coverage` échouent. Sont exclus `MddApiApplication`, qui ne fait que démarrer l’application, et le code généré par Lombok.
+La couverture est contrôlée à 80 % des lignes et des branches, avec [JaCoCo](https://www.jacoco.org/jacoco/) pour le back-end et Vitest pour le front-end : en dessous de ce seuil, `./mvnw verify` et `npm run test:coverage` échouent. Sont exclus `MddApiApplication`, qui ne fait que démarrer l’application, le code généré par Lombok et les outils partagés des tests front-end (`src/testing`).
 
 Une intégration continue ([GitHub Actions](https://docs.github.com/actions)) relance sous Linux, à chaque pull request, les tests, les seuils de couverture, la mise en forme et le lint. Seuls les tests Cypress, qui demandent la vraie API, se lancent à la main.
 
@@ -283,7 +284,10 @@ Une intégration continue ([GitHub Actions](https://docs.github.com/actions)) re
 
 ### 3.3 Revue technique
 
-*À compléter au fil du développement.*
+#### Améliorations à prévoir rapidement
+
+- **Mot de passe pour les changements sensibles** : changer d’adresse e-mail ou supprimer son compte ne redemande pas le mot de passe actuel, alors que l’[OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html) le recommande au moins pour l’e-mail. Une session restée ouverte suffit donc pour supprimer le compte, ou pour remplacer l’e-mail et bloquer ainsi l’accès de son titulaire, qui se connecte avec cette adresse.
+- **Confirmation de la nouvelle adresse e-mail** : une nouvelle adresse devrait être confirmée par un lien qui lui est envoyé, avant de remplacer l’ancienne. Cela demande un service d’envoi d’e-mails, que le MVP n’utilise pas.
 
 <!-- Synthèse critique du code : points forts (structure, modularité, lisibilité), points à améliorer (complexité, dette technique, sécurité), actions correctives appliquées. -->
 

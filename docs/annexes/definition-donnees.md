@@ -11,7 +11,7 @@ Toutes les colonnes sont obligatoires (`NOT NULL`), et l’unicité ne distingue
 ### Utilisateurs (`users`)
 
 - **`username`** : `VARCHAR(30)`, unique. Saisi par l’utilisateur : de 3 à 30 caractères, uniquement des lettres sans accent, des chiffres, `.`, `_` et `-`.
-- **`email`** : `VARCHAR(255)`, unique. Saisi par l’utilisateur : une adresse e-mail valide, qui sert à se connecter.
+- **`email`** : `VARCHAR(255)`, unique. Saisi par l’utilisateur : une adresse e-mail valide de 254 caractères au plus (limite de la RFC 5321), qui sert à se connecter.
 - **`password`** : `VARCHAR(255)`, le mot de passe haché avec Argon2id, jamais en clair ; la taille de la colonne permettra de changer d’algorithme plus tard. Le mot de passe saisi compte de 8 à 64 caractères, dont au moins un chiffre, une minuscule, une majuscule et un caractère spécial (ni lettre ni chiffre).
 
 ### Thèmes (`topics`)
@@ -63,7 +63,7 @@ Règles communes :
 
 - **Champ obligatoire** : non vide et pas seulement composé d’espaces.
 - **Valeur déjà prise** : un nom d’utilisateur ou un e-mail déjà utilisé donne un message explicite.
-- **Mot de passe du profil** : laissé vide, il reste inchangé. Un formulaire à part, qui exigerait le mot de passe actuel comme le recommande l’OWASP, serait plus sûr, mais la maquette place ce champ dans le profil.
+- **Changement de mot de passe** : un formulaire à part exige le mot de passe actuel, comme le recommande l’OWASP, pour qu’une session restée ouverte ne suffise pas ; un mot de passe actuel erroné est signalé sous son champ.
 
 ## Sécurisation
 
