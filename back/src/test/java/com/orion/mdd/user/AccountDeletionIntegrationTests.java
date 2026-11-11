@@ -66,7 +66,7 @@ class AccountDeletionIntegrationTests {
 
     @Test
     void deletesTheSubscriptionsOfTheAccount() throws Exception {
-        // Arrange: subscriptions get their own endpoints later, so the row is written directly
+        // Arrange: the row is written directly, so that this test depends on no other feature
         jdbcTemplate.update("INSERT INTO subscriptions (user_id, topic_id) SELECT ?, id FROM topics LIMIT 1",
                 user.getId());
 

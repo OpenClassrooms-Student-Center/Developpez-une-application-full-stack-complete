@@ -85,4 +85,14 @@ public class User {
         return subscriptions.contains(topic);
     }
 
+    /**
+     * Follows a topic. Following it again changes nothing, since the subscriptions form a set.
+     *
+     * @param topic
+     *            a topic loaded in the same transaction
+     */
+    public void subscribe(Topic topic) {
+        subscriptions.add(topic);
+    }
+
 }

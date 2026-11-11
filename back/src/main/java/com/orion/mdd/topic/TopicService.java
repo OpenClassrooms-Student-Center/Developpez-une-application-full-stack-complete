@@ -1,5 +1,6 @@
 package com.orion.mdd.topic;
 
+import com.orion.mdd.common.exception.TopicNotFoundException;
 import com.orion.mdd.common.exception.UserNotFoundException;
 import com.orion.mdd.user.User;
 import com.orion.mdd.user.UserService;
@@ -10,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * Lists the topics, with the ones the logged-in user follows.
+ * Lists the topics, with the ones the logged-in user follows, and subscribes the user to them.
  */
 @Service
 public class TopicService {
@@ -41,6 +42,29 @@ public class TopicService {
         return topicRepository.findAll(BY_TITLE).stream()
                 .map(topic -> TopicResponse.from(topic, user.isSubscribedTo(topic)))
                 .toList();
+    }
+
+    /**
+     * Subscribes the user to a topic. Hibernate writes the new row when the transaction ends, and writes nothing if
+     * the user already follows the topic.
+     *
+     * @param userId
+     *            the identifier carried by the token
+     * @param topicId
+     *            the topic to follow
+     * @throws UserNotFoundException
+     *             if the account no longer exists
+     * @throws TopicNotFoundException
+     *             if the topic does not exist
+     */
+    @Transactional
+    public void subscribe(Long userId, Long topicId) {
+        User user = userService.getCurrentUser(userId);
+        user.subscribe(getTopic(topicId));
+    }
+
+    private Topic getTopic(Long id) {
+        return topicRepository.findById(id).orElseThrow(TopicNotFoundException::new);
     }
 
 }
