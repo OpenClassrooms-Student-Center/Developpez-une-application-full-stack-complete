@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -81,8 +82,36 @@ class SubscriptionsIntegrationTests {
                 .andExpect(jsonPath("$.detail").value("Ce thème n’existe pas."));
     }
 
+    @Test
+    void unsubscribesTheUserFromTheTopic() throws Exception {
+        // Arrange: flush writes the subscription now, so that the unsubscription has a row to delete
+        subscribe(topicId);
+        userRepository.flush();
+
+        // Act
+        ResultActions response = unsubscribe(topicId);
+
+        // Assert
+        response.andExpect(status().isNoContent());
+        assertThat(subscriptionRows()).isZero();
+    }
+
+    @Test
+    void changesNothingWhenTheUserDoesNotFollowTheTopic() throws Exception {
+        // Act
+        ResultActions response = unsubscribe(topicId);
+
+        // Assert
+        response.andExpect(status().isNoContent());
+        assertThat(subscriptionRows()).isZero();
+    }
+
     private ResultActions subscribe(Long id) throws Exception {
         return mockMvc.perform(put("/api/topics/{id}/subscription", id).cookie(token).with(Csrf.from(mockMvc)));
+    }
+
+    private ResultActions unsubscribe(Long id) throws Exception {
+        return mockMvc.perform(delete("/api/topics/{id}/subscription", id).cookie(token).with(Csrf.from(mockMvc)));
     }
 
     // Flush writes now what the end of a real request would write, since the test transaction never commits

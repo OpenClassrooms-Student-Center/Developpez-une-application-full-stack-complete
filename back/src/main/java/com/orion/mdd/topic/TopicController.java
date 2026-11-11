@@ -9,6 +9,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Exposes the topics to the logged-in users, who can subscribe to them.
+ * Exposes the topics to the logged-in users, who can subscribe to them and unsubscribe from them.
  */
 @RestController
 @RequestMapping("/api/topics")
@@ -68,6 +69,28 @@ public class TopicController {
                     schema = @Schema(implementation = ProblemDetail.class)))
     public ResponseEntity<Void> subscribe(@AuthenticationPrincipal Jwt jwt, @PathVariable Long id) {
         topicService.subscribe(userId(jwt), id);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Unsubscribes the logged-in user from a topic. Nothing changes if the user did not follow it.
+     *
+     * @param jwt
+     *            the verified token
+     * @param id
+     *            the topic's identifier
+     * @return an empty response
+     */
+    @DeleteMapping("/{id}/subscription")
+    @ApiResponse(responseCode = "204", description = "Unsubscribed, even if the user did not follow the topic")
+    @ApiResponse(responseCode = "401", description = "Not logged in, or the account no longer exists",
+            content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE,
+                    schema = @Schema(implementation = ProblemDetail.class)))
+    @ApiResponse(responseCode = "404", description = "Topic not found",
+            content = @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE,
+                    schema = @Schema(implementation = ProblemDetail.class)))
+    public ResponseEntity<Void> unsubscribe(@AuthenticationPrincipal Jwt jwt, @PathVariable Long id) {
+        topicService.unsubscribe(userId(jwt), id);
         return ResponseEntity.noContent().build();
     }
 

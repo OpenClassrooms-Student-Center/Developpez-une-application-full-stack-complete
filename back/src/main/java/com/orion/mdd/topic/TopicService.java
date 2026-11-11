@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * Lists the topics, with the ones the logged-in user follows, and subscribes the user to them.
+ * Lists the topics, with the ones the logged-in user follows, and subscribes or unsubscribes the user.
  */
 @Service
 public class TopicService {
@@ -61,6 +61,25 @@ public class TopicService {
     public void subscribe(Long userId, Long topicId) {
         User user = userService.getCurrentUser(userId);
         user.subscribe(getTopic(topicId));
+    }
+
+    /**
+     * Unsubscribes the user from a topic. Hibernate deletes the row when the transaction ends, and deletes nothing
+     * if the user did not follow the topic.
+     *
+     * @param userId
+     *            the identifier carried by the token
+     * @param topicId
+     *            the topic to stop following
+     * @throws UserNotFoundException
+     *             if the account no longer exists
+     * @throws TopicNotFoundException
+     *             if the topic does not exist
+     */
+    @Transactional
+    public void unsubscribe(Long userId, Long topicId) {
+        User user = userService.getCurrentUser(userId);
+        user.unsubscribe(getTopic(topicId));
     }
 
     private Topic getTopic(Long id) {

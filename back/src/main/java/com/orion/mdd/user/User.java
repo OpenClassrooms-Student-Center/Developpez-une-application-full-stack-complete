@@ -95,4 +95,14 @@ public class User {
         subscriptions.add(topic);
     }
 
+    /**
+     * Stops following a topic. Nothing changes if the user did not follow it.
+     *
+     * @param topic
+     *            a topic loaded in the same transaction
+     */
+    public void unsubscribe(Topic topic) {
+        subscriptions.remove(topic);
+    }
+
 }
