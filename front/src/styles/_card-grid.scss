@@ -1,0 +1,22 @@
+// The cards of the topics and the articles: 340 pixels wide, as many per row as the page allows,
+// four at most
+$width: 340px;
+$gap: 24px;
+
+// The list of cards, centered on the page
+@mixin list {
+  display: grid;
+  // Narrower only on a screen too small for one card
+  grid-template-columns: repeat(auto-fill, min($width, 100%));
+  gap: $gap;
+  justify-content: center;
+  max-width: 4 * $width + 3 * $gap;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+
+  // Each card fills its cell, so that the cards of a row have the same height
+  > li {
+    display: grid;
+  }
+}

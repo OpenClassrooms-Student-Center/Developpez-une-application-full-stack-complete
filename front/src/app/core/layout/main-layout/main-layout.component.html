@@ -3,6 +3,14 @@
   <nav aria-label="Navigation principale">
     <button class="logout" matButton type="button" (click)="logOut()">Se déconnecter</button>
     <a
+      class="link"
+      matButton
+      routerLink="/topics"
+      routerLinkActive="active"
+      ariaCurrentWhenActive="page"
+      >Thèmes</a
+    >
+    <a
       class="profile"
       matIconButton
       routerLink="/profile"

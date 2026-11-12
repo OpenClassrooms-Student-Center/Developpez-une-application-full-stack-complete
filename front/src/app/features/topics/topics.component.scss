@@ -1,0 +1,22 @@
+@use '@angular/cdk';
+@use 'card-grid';
+
+// The page title, read by screen readers only: the mockup shows none
+@include cdk.a11y-visually-hidden();
+
+.topics {
+  padding: 1.5rem 1rem;
+
+  @media (min-width: 600px) {
+    padding: 1.5rem 2.5rem;
+  }
+}
+
+.failure {
+  color: var(--mat-sys-error);
+  text-align: center;
+}
+
+.cards {
+  @include card-grid.list;
+}

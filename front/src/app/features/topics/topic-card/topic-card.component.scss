@@ -1,0 +1,41 @@
+@use '@angular/material' as mat;
+
+// The card of the mockup
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 12px 20px;
+  border-radius: 8px;
+  background-color: #f5f5f5;
+
+  // The button, filled and violet like the submit buttons of the account forms
+  @include mat.button-overrides(
+    (
+      filled-container-shape: 8px,
+    )
+  );
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+// Three lines at most, then an ellipsis
+.description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  margin: 0;
+}
+
+// At the bottom of the card, so that a row's buttons line up, and as wide as the form buttons
+.action {
+  display: grid;
+  grid-template-columns: 10rem;
+  justify-content: center;
+  margin-top: auto;
+}

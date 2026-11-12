@@ -1,0 +1,18 @@
+<section class="topics">
+  <h1 class="cdk-visually-hidden">Thèmes</h1>
+  @if (topics.error()) {
+    <p class="failure" role="alert">Les thèmes n’ont pas pu être chargés. Veuillez réessayer.</p>
+  } @else if (topics.hasValue()) {
+    <ul class="cards">
+      @for (topic of topics.value(); track topic.id) {
+        <li>
+          <app-topic-card [topic]="topic">
+            <button matButton="filled" type="button" [disabled]="topic.subscribed">
+              {{ topic.subscribed ? 'Déjà abonné' : 'S’abonner' }}
+            </button>
+          </app-topic-card>
+        </li>
+      }
+    </ul>
+  }
+</section>

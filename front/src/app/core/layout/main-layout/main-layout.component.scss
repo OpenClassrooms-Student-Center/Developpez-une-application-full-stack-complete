@@ -23,6 +23,27 @@
   @include danger-button.text;
 }
 
+// Topics: black, then violet on hover, on keyboard focus and on its page, like the profile icon
+.link {
+  @include mat.button-overrides(
+    (
+      text-label-text-color: var(--mat-sys-on-surface),
+      text-label-text-size: 20px,
+      text-label-text-weight: 400,
+    )
+  );
+
+  &:hover,
+  &:focus-visible,
+  &.active {
+    @include mat.button-overrides(
+      (
+        text-label-text-color: var(--mat-sys-primary),
+      )
+    );
+  }
+}
+
 nav {
   display: flex;
   align-items: center;
