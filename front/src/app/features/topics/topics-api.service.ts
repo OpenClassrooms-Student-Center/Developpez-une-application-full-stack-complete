@@ -21,4 +21,11 @@ export class TopicsApi {
   subscribe(id: number): Observable<void> {
     return this.http.put<void>(`/api/topics/${id}/subscription`, null);
   }
+
+  /**
+   * Stops following a topic. Nothing changes if the user did not follow it.
+   */
+  unsubscribe(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/topics/${id}/subscription`);
+  }
 }

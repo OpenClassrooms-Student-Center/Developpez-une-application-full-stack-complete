@@ -1,12 +1,26 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 
-import { fieldError, openApp, submit, type } from '../../../testing/app-testing';
+import { fieldError, openApp, OpenedApp, submit, type } from '../../../testing/app-testing';
 import { Session } from '../../core/session/session.service';
 import { User } from '../../core/session/user.model';
+import { Topic } from '../topics/topic.model';
 
 describe('Profile page', () => {
   const user: User = { id: 42, username: 'arthur.dent', email: 'arthur.dent@example.com' };
+
+  const topics: Topic[] = [
+    { id: 1, title: 'Babel fish', description: 'Translates any language.', subscribed: false },
+    { id: 2, title: 'Towels', description: 'The most useful thing to carry.', subscribed: true },
+  ];
+
+  // Opens the profile and answers the request for the topics that its Subscriptions section sends
+  async function openProfile(answer: Topic[] = topics): Promise<OpenedApp> {
+    const opened = await openApp('/profile', user);
+    opened.http.expectOne('/api/topics').flush(answer);
+    await opened.fixture.whenStable();
+    return opened;
+  }
 
   function valueOf(page: HTMLElement, id: string): string {
     return (page.querySelector(`#${id}`) as HTMLInputElement).value;
@@ -14,12 +28,14 @@ describe('Profile page', () => {
 
   it('opens from the header, whose link then marks the current page', async () => {
     // Arrange
-    const { fixture, page } = await openApp('/feed', user);
+    const { fixture, http, page } = await openApp('/feed', user);
     const link = page.querySelector('header a[href="/profile"]') as HTMLAnchorElement;
     expect(link.getAttribute('aria-current')).toBeNull();
 
-    // Act
+    // Act: once open, the page asks for the topics
     link.click();
+    const request = await vi.waitFor(() => http.expectOne('/api/topics'));
+    request.flush(topics);
     await fixture.whenStable();
 
     // Assert
@@ -29,7 +45,7 @@ describe('Profile page', () => {
 
   it('shows the username and the e-mail address', async () => {
     // Act
-    const { page } = await openApp('/profile', user);
+    const { page } = await openProfile();
 
     // Assert
     expect(page.querySelector('h1')?.textContent).toContain('Profil utilisateur');
@@ -39,7 +55,7 @@ describe('Profile page', () => {
 
   it('saves the profile and says so', async () => {
     // Arrange
-    const { fixture, http, page } = await openApp('/profile', user);
+    const { fixture, http, page } = await openProfile();
     const saved = { ...user, username: 'ford.prefect' };
     type(page, 'username', saved.username);
 
@@ -60,7 +76,7 @@ describe('Profile page', () => {
 
   it('sends nothing while a field is invalid', async () => {
     // Arrange: one case, since the rules have their own unit test
-    const { fixture, http, page } = await openApp('/profile', user);
+    const { fixture, http, page } = await openProfile();
     type(page, 'email', 'arthur.dent');
 
     // Act
@@ -74,7 +90,7 @@ describe('Profile page', () => {
 
   it('shows under the field a value that another user has taken', async () => {
     // Arrange
-    const { fixture, http, page } = await openApp('/profile', user);
+    const { fixture, http, page } = await openProfile();
     const message = 'Cette adresse e-mail est déjà utilisée.';
     type(page, 'email', 'ford.prefect@example.com');
 
@@ -95,7 +111,7 @@ describe('Profile page', () => {
 
   it('lets the user try again after a failure of the API', async () => {
     // Arrange
-    const { fixture, http, page } = await openApp('/profile', user);
+    const { fixture, http, page } = await openProfile();
 
     // Act: a first try
     submit(page);
@@ -122,8 +138,8 @@ describe('Profile page', () => {
       ) as HTMLButtonElement;
     }
 
-    async function askForDeletion(): Promise<Awaited<ReturnType<typeof openApp>>> {
-      const opened = await openApp('/profile', user);
+    async function askForDeletion(): Promise<OpenedApp> {
+      const opened = await openProfile();
       button(opened.page, 'Supprimer mon compte').click();
       await opened.fixture.whenStable();
       return opened;
@@ -185,6 +201,81 @@ describe('Profile page', () => {
     });
   });
 
+  describe('subscriptions', () => {
+    function cards(page: HTMLElement): HTMLElement[] {
+      return [...page.querySelectorAll('app-subscriptions app-topic-card')] as HTMLElement[];
+    }
+
+    it('lists the topics the user follows, each with a button to unsubscribe', async () => {
+      // Act
+      const { page } = await openProfile();
+
+      // Assert
+      expect(page.querySelector('app-subscriptions h2')?.textContent).toContain('Abonnements');
+      const [towels, ...others] = cards(page);
+      expect(others).toHaveLength(0);
+      expect(towels.querySelector('h3')?.textContent).toContain('Towels');
+      expect(towels.textContent).toContain('The most useful thing to carry.');
+      expect(towels.querySelector('button')?.textContent).toContain('Se désabonner');
+    });
+
+    it('says so when the user follows no topic', async () => {
+      // Act
+      const { page } = await openProfile(topics.map((topic) => ({ ...topic, subscribed: false })));
+
+      // Assert
+      expect(cards(page)).toHaveLength(0);
+      expect(page.querySelector('app-subscriptions p')?.textContent?.trim()).toBeTruthy();
+    });
+
+    it('says so when the subscriptions cannot be loaded', async () => {
+      // Arrange
+      const { fixture, http, page } = await openApp('/profile', user);
+
+      // Act
+      http
+        .expectOne('/api/topics')
+        .flush(null, { status: 500, statusText: 'Internal Server Error' });
+      await fixture.whenStable();
+
+      // Assert
+      expect(
+        page.querySelector('app-subscriptions [role="alert"]')?.textContent?.trim(),
+      ).toBeTruthy();
+    });
+
+    it('unsubscribes the user, then takes the topic out of the list', async () => {
+      // Arrange
+      const { fixture, http, page } = await openProfile();
+
+      // Act
+      cards(page)[0].querySelector('button')?.click();
+      const request = http.expectOne('/api/topics/2/subscription');
+      request.flush(null, { status: 204, statusText: 'No Content' });
+      await fixture.whenStable();
+
+      // Assert
+      expect(request.request.method).toBe('DELETE');
+      expect(cards(page)).toHaveLength(0);
+    });
+
+    it('keeps the topic and says why when the unsubscription fails', async () => {
+      // Arrange
+      const { fixture, http, page } = await openProfile();
+
+      // Act
+      cards(page)[0].querySelector('button')?.click();
+      http
+        .expectOne('/api/topics/2/subscription')
+        .flush(null, { status: 500, statusText: 'Internal Server Error' });
+      await fixture.whenStable();
+
+      // Assert
+      expect(cards(page)).toHaveLength(1);
+      expect(document.querySelector('mat-snack-bar-container')?.textContent?.trim()).toBeTruthy();
+    });
+  });
+
   describe('password form', () => {
     function passwordForm(page: HTMLElement): HTMLElement {
       return page.querySelector('app-password-form') as HTMLElement;
@@ -192,7 +283,7 @@ describe('Profile page', () => {
 
     it('changes the password, empties the fields and says so', async () => {
       // Arrange
-      const { fixture, http, page } = await openApp('/profile', user);
+      const { fixture, http, page } = await openProfile();
       type(page, 'currentPassword', 'Dont-Panic-42');
       type(page, 'newPassword', 'So-Long-42');
 
@@ -218,7 +309,7 @@ describe('Profile page', () => {
 
     it('sends nothing while the new password is invalid', async () => {
       // Arrange
-      const { fixture, http, page } = await openApp('/profile', user);
+      const { fixture, http, page } = await openProfile();
       type(page, 'currentPassword', 'Dont-Panic-42');
       type(page, 'newPassword', 'Deep-42');
 
@@ -233,7 +324,7 @@ describe('Profile page', () => {
 
     it('shows under the field a wrong current password', async () => {
       // Arrange
-      const { fixture, http, page } = await openApp('/profile', user);
+      const { fixture, http, page } = await openProfile();
       const message = 'Le mot de passe actuel est incorrect.';
       type(page, 'currentPassword', 'Wrong-Password-42');
       type(page, 'newPassword', 'So-Long-42');
@@ -254,7 +345,7 @@ describe('Profile page', () => {
 
     it('lets the user try again after a failure of the API', async () => {
       // Arrange
-      const { fixture, http, page } = await openApp('/profile', user);
+      const { fixture, http, page } = await openProfile();
       type(page, 'currentPassword', 'Dont-Panic-42');
       type(page, 'newPassword', 'So-Long-42');
 

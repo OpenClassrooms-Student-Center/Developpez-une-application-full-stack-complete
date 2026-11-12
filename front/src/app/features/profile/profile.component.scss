@@ -1,7 +1,17 @@
+// The margins of the page, like those of the topics page
+:host {
+  display: block;
+  padding: 1.5rem 1rem;
+
+  @media (min-width: 600px) {
+    padding: 1.5rem 2.5rem;
+  }
+}
+
+// The account forms, narrower than the subscriptions
 .profile {
   max-width: 24rem;
   margin: 0 auto;
-  padding: 1.5rem 1rem;
 }
 
 h1 {
@@ -9,4 +19,11 @@ h1 {
   font: var(--mat-sys-headline-small);
   font-weight: 700;
   text-align: center;
+}
+
+// The line of the mockup between the profile and the subscriptions
+hr {
+  margin: 1.5rem 0;
+  border: none;
+  border-top: 1px solid var(--mat-sys-on-surface);
 }

@@ -1,0 +1,26 @@
+@use 'card-grid';
+
+:host {
+  display: block;
+}
+
+// Like the title of the profile page
+h2 {
+  margin: 0 0 1.5rem;
+  font: var(--mat-sys-headline-small);
+  font-weight: 700;
+  text-align: center;
+}
+
+.failure,
+.empty {
+  text-align: center;
+}
+
+.failure {
+  color: var(--mat-sys-error);
+}
+
+.cards {
+  @include card-grid.list;
+}

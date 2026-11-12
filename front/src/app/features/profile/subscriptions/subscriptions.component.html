@@ -1,0 +1,20 @@
+<h2>Abonnements</h2>
+@if (topics.error()) {
+  <p class="failure" role="alert">Vos abonnements n’ont pas pu être chargés. Veuillez réessayer.</p>
+} @else if (topics.hasValue()) {
+  @if (topics.value().length > 0) {
+    <ul class="cards">
+      @for (topic of topics.value(); track topic.id) {
+        <li>
+          <app-topic-card [topic]="topic" [headingLevel]="3">
+            <button matButton="filled" type="button" (click)="unsubscribe(topic)">
+              Se désabonner
+            </button>
+          </app-topic-card>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="empty">Aucun abonnement pour l’instant.</p>
+  }
+}

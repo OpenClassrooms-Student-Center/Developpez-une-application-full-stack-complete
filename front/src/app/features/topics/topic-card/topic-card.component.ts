@@ -13,4 +13,6 @@ import { Topic } from '../topic.model';
 })
 export class TopicCard {
   readonly topic = input.required<Topic>();
+  // The title is a heading of the page: level 2 on the topics page, level 3 under Subscriptions
+  readonly headingLevel = input<2 | 3>(2);
 }
