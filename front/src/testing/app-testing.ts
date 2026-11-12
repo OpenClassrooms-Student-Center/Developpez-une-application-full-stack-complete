@@ -38,7 +38,8 @@ export async function openApp(url: string, user: User | null): Promise<OpenedApp
 
   const fixture = TestBed.createComponent(App);
   await TestBed.inject(Router).navigateByUrl(url);
-  await fixture.whenStable();
+  // Draws the page without waiting for the data it loads: the test answers its requests first
+  TestBed.tick();
   return { fixture, http, page: fixture.nativeElement as HTMLElement };
 }
 
