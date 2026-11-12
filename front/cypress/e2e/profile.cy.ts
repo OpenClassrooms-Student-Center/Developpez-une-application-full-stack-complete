@@ -1,23 +1,9 @@
+import { createAccount, password } from '../support/accounts';
+
 describe('Profile', () => {
-  const password = 'Dont-Panic-42';
-
-  function createAccountAndLogIn(username: string): string {
-    const email = `${username}@example.com`;
-    cy.request({ url: '/api/users/me', failOnStatusCode: false });
-    cy.getCookie('XSRF-TOKEN').then((csrf) =>
-      cy.request({
-        method: 'POST',
-        url: '/api/auth/register',
-        headers: { 'X-XSRF-TOKEN': csrf?.value ?? '' },
-        body: { username, email, password },
-      }),
-    );
-    return email;
-  }
-
   it('changes the username and keeps it after a reload', () => {
     const username = `marvin_${Date.now()}`;
-    createAccountAndLogIn(username);
+    createAccount(username);
     cy.visit('/feed');
 
     cy.get('header a[aria-label="Profil"]').click();
@@ -31,7 +17,7 @@ describe('Profile', () => {
   });
 
   it('changes the password, which then opens the account', () => {
-    const email = createAccountAndLogIn(`marvin_${Date.now()}`);
+    const email = createAccount(`marvin_${Date.now()}`);
     cy.visit('/profile');
 
     cy.get('#currentPassword').type(password);
@@ -45,7 +31,7 @@ describe('Profile', () => {
   });
 
   it('deletes the account once confirmed, so that it can no longer log in', () => {
-    const email = createAccountAndLogIn(`marvin_${Date.now()}`);
+    const email = createAccount(`marvin_${Date.now()}`);
     cy.visit('/profile');
 
     cy.contains('button', 'Supprimer mon compte').click();

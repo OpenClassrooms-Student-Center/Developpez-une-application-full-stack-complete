@@ -1,17 +1,9 @@
-describe('Login and logout', () => {
-  const password = 'Dont-Panic-42';
+import { createAccount, password } from '../support/accounts';
 
-  function createAccount(username: string): string {
-    const email = `${username}@example.com`;
-    cy.request({ url: '/api/users/me', failOnStatusCode: false });
-    cy.getCookie('XSRF-TOKEN').then((csrf) =>
-      cy.request({
-        method: 'POST',
-        url: '/api/auth/register',
-        headers: { 'X-XSRF-TOKEN': csrf?.value ?? '' },
-        body: { username, email, password },
-      }),
-    );
+describe('Login and logout', () => {
+  // Creates the account, then logs the browser out, so that the test logs in by itself
+  function createLoggedOutAccount(username: string): string {
+    const email = createAccount(username);
     cy.clearCookies();
     return email;
   }
@@ -24,7 +16,7 @@ describe('Login and logout', () => {
   }
 
   it('logs the user in, keeps them logged in and logs them out', () => {
-    const email = createAccount(`trillian_${Date.now()}`);
+    const email = createLoggedOutAccount(`trillian_${Date.now()}`);
 
     logIn(email, password);
     cy.location('pathname').should('eq', '/feed');
@@ -42,7 +34,7 @@ describe('Login and logout', () => {
   });
 
   it('refuses a wrong password', () => {
-    const email = createAccount(`trillian_${Date.now()}`);
+    const email = createLoggedOutAccount(`trillian_${Date.now()}`);
 
     logIn(email, 'Wrong-Password-42');
 
