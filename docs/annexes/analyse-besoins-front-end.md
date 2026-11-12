@@ -52,14 +52,14 @@ Cette annexe a pour but de relier chaque écran des maquettes aux fonctionnalit�
 
 - **Accès** : utilisateur connecté.
 - **Fonctionnalités** : Thème, Abonnement (abonnement).
-- **Contenu** : bandeau, puis les thèmes, deux par ligne sur ordinateur, chacun avec un titre, une description tronquée à 3 lignes et un bouton actif « S’abonner » ou inactif « Déjà abonné » selon le cas.
+- **Contenu** : bandeau, puis les thèmes, d’un à quatre par ligne selon la largeur de l’écran (voir les écarts), chacun avec un titre, une description tronquée à 3 lignes et un bouton actif « S’abonner » ou inactif « Déjà abonné » selon le cas.
 - **Règles** : tous les thèmes sont listés, abonné ou non ; après un clic, le bouton devient inactif et affiche « Déjà abonné » ; le désabonnement se fait depuis le profil.
 
 ### Profil
 
 - **Accès** : utilisateur connecté.
 - **Fonctionnalités** : Profil, Abonnement (désabonnement).
-- **Contenu** : bandeau, titre « Profil utilisateur », formulaire prérempli avec le nom d’utilisateur, l’e-mail et le bouton « Sauvegarder », puis le formulaire « Mot de passe » (« Mot de passe actuel », « Nouveau mot de passe », bouton « Modifier »). Puis la section « Abonnements » : les thèmes suivis, chacun avec son titre, sa description et un bouton « Se désabonner ». Enfin, un bouton « Supprimer mon compte ».
+- **Contenu** : bandeau, titre « Profil utilisateur », formulaire prérempli avec le nom d’utilisateur, l’e-mail et le bouton « Sauvegarder », puis le formulaire « Mot de passe » (« Mot de passe actuel », « Nouveau mot de passe », bouton « Modifier ») et un bouton « Supprimer mon compte ». Puis la section « Abonnements » : les thèmes suivis, chacun avec son titre, sa description et un bouton « Se désabonner ».
 - **Règles** : l’e-mail, le nom d’utilisateur et le mot de passe sont modifiables, avec les règles de l’inscription ; changer de mot de passe demande l’actuel ; un message confirme chaque enregistrement ; on s’y désabonne d’un thème ; la suppression du compte demande une confirmation.
 
 ### Pages légales
@@ -89,3 +89,4 @@ Un bandeau dont le visuel change comme suit :
 - **Pages légales et suppression du compte** : absentes des spécifications et des maquettes, elles répondent aux obligations légales : mentions légales, politique de confidentialité et droit à l’effacement des données personnelles (RGPD).
 - **Formulaire du mot de passe** : la maquette place le mot de passe dans le formulaire du profil ; il a son propre formulaire, qui demande le mot de passe actuel, pour qu’une session restée ouverte ne suffise pas à le changer.
 - **Messages de confirmation** : absents de la maquette, « Profil mis à jour. » et « Mot de passe modifié. » indiquent que l’enregistrement a réussi, puisque la page reste affichée.
+- **Cartes par ligne** : la maquette en montre deux sur ordinateur. Sur la page des thèmes comme dans les abonnements du profil, les cartes gardent une largeur fixe de 340 px, et chaque ligne en compte autant que l’écran le permet, jusqu’à quatre. Deux cartes étirées sur toute la largeur d’un grand écran donneraient des lignes de texte trop longues pour être lues confortablement.

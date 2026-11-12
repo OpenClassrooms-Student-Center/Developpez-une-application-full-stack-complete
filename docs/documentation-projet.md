@@ -2,7 +2,7 @@
 
 - **Auteur** : Lisa Bergeron
 - **Version** : 0.1.0
-- **Date** : 10/11/2026
+- **Date** : 12/11/2026
 
 ## 1. Présentation générale du projet
 
@@ -20,8 +20,8 @@ Avant de l’ouvrir à un large public, ORION souhaite le tester avec un MVP (Mi
 | Inscription | S’inscrire avec un e-mail, un nom d’utilisateur et un mot de passe | ✅ Terminé |
 | Connexion | Se connecter avec son e-mail, se déconnecter | ✅ Terminé |
 | Profil | Consulter et modifier son profil, supprimer son compte | ✅ Terminé |
-| Thème | Consulter la liste de tous les thèmes | ⏳ À venir |
-| Abonnement | S’abonner à un thème et s’en désabonner | ⏳ À venir |
+| Thème | Consulter la liste de tous les thèmes | ✅ Terminé |
+| Abonnement | S’abonner à un thème et s’en désabonner | ✅ Terminé |
 | Fil d’actualité | Consulter et trier son fil d’actualité | ⏳ À venir |
 | Article | Ajouter et consulter un article | ⏳ À venir |
 | Commentaire | Commenter un article | ⏳ À venir |
