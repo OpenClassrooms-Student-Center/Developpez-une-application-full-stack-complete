@@ -7,7 +7,12 @@
       @for (topic of topics.value(); track topic.id) {
         <li>
           <app-topic-card [topic]="topic">
-            <button matButton="filled" type="button" [disabled]="topic.subscribed">
+            <button
+              matButton="filled"
+              type="button"
+              [disabled]="topic.subscribed"
+              (click)="subscribe(topic)"
+            >
               {{ topic.subscribed ? 'Déjà abonné' : 'S’abonner' }}
             </button>
           </app-topic-card>

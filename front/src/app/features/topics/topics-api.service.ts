@@ -14,4 +14,11 @@ export class TopicsApi {
   list(): Observable<Topic[]> {
     return this.http.get<Topic[]>('/api/topics');
   }
+
+  /**
+   * Follows a topic. Following it again changes nothing.
+   */
+  subscribe(id: number): Observable<void> {
+    return this.http.put<void>(`/api/topics/${id}/subscription`, null);
+  }
 }
